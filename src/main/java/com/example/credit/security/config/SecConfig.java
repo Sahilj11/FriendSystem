@@ -17,6 +17,8 @@ public class SecConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http.cors(AbstractHttpConfigurer::disable);
         http.csrf(AbstractHttpConfigurer::disable);
+        http.authorizeHttpRequests(req->req.requestMatchers("/auth/login/**").permitAll());
+        http.formLogin(login -> login.loginPage("/auth/login"));
         return http.build();
     }
 
