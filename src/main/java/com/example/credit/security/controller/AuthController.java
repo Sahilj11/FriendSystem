@@ -6,17 +6,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.credit.security.dto.LoginDto;
 import com.example.credit.security.dto.SignupDto;
+import com.example.credit.security.service.AuthService;
+import com.example.credit.security.service.CustomUserDetailService;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * AuthController
  */
 @Controller
 @RequestMapping(path = "/auth")
+@RequiredArgsConstructor
 public class AuthController {
+    private final AuthService authService;
 
    @PostMapping(path="/login")
    public void login(LoginDto loginDto){
-      // check if req correct
+       authService.loginAuth(loginDto);
      // login user to app
      // redirecting it to home page 
    } 
