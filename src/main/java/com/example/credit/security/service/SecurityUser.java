@@ -33,7 +33,7 @@ public class SecurityUser implements UserDetails{
 
     @Override
     public String getUsername() {
-        return userEntity.getUniquename();
+        return userEntity.getName();
     }
 
     @Override

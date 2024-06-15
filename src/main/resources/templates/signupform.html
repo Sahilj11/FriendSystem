@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/common::commonHead}"> </head>
+
+<body>
+    <div class="flex items-center justify-center h-screen">
+        <div class="bg-gray-900 text-white w-[700px] h-3/4 min-w-[200px]">
+            <div>
+                <h1 class="text-center font-bold">Create your Free Account</h1>
+            </div>
+            <form action="/auth/signup" method="post">
+                <div>
+                    <label for="name">Name
+                        <input type="text" name="name" value="" id="name" placeholder="Enter your name" class="block">
+                    </label>
+                </div>
+                <div>
+                    <label for="email">Email
+                        <input type="text" name="email" value="" id="email" placeholder="Email id" class="block">
+                    </label>
+                </div>
+                <div>
+                    <label for="pass">New Password
+                        <input type="text" name="password" value="" id="pass" placeholder="New password" class="block">
+                    </label>
+                </div>
+                <div>
+                    <label for="confirmpass">Confirm Password
+                        <input type="password" name="confirmPass" value="" id="confirmpass"
+                            placeholder="Confirm password" class="block">
+                    </label>
+                </div>
+                <div>
+                    <input type="checkbox" name="agreeterms" id="">
+                    <span>I Agree to terms and conditions</span>
+                </div>
+                <div>
+                    <button type="submit">Create Account</button>
+                </div>
+            </form>
+            <div>
+                <p class="text-blue-700 font-bold"><a href="/auth/login">Already have an account?</a></p>
+            </div>
+        </div>
+</body>
+
+</html>

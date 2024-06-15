@@ -9,4 +9,5 @@ import com.example.credit.entities.RoleEntity;
  */
 public interface RoleRepo extends JpaRepository<RoleEntity,Integer>{
 
+    RoleEntity findByRoleName(String rolename);
 }
