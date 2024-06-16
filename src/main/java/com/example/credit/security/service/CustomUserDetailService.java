@@ -22,7 +22,7 @@ public class CustomUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<UserEntity> user = usRepo.findByUniquename(username);
+        Optional<UserEntity> user = usRepo.findByEmail(username);
         try {
             var userEntity = user.orElseThrow();
             return new SecurityUser(userEntity);

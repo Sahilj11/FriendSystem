@@ -2,8 +2,8 @@ package com.example.credit.security.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.credit.security.dto.LoginDto;
@@ -27,10 +27,10 @@ public class AuthController {
     }
 
     @PostMapping(path = "login")
-    public String login(@Valid @RequestBody LoginDto loginDto) {
+    public String login(@Valid @ModelAttribute LoginDto loginDto) {
         if (authService.loginAuth(loginDto)) {
             return "home";
-        }else{
+        } else {
             return "loginform";
         }
     }
@@ -41,9 +41,9 @@ public class AuthController {
     }
 
     @PostMapping(path = "signup")
-    public String signup(@Valid @RequestBody SignupDto signupDto) {
-        if (!signupDto.password().equals(signupDto.confirmPass()) || signupDto.agreeterms() == false) {
-           return "signupform"; 
+    public String signup(@Valid @ModelAttribute SignupDto signupDto) {
+        if (!signupDto.password().equals(signupDto.confirmPass()) || !signupDto.agreeterms()) {
+            return "signupform";
         }
         if (authService.signupService(signupDto)) {
             return "home";

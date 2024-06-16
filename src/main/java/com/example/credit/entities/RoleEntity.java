@@ -18,9 +18,10 @@ import lombok.Setter;
 public class RoleEntity {
 
    @Id
+   @Column(name = "role_id")
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private int id;
 
-   @Column(nullable = false)
+   @Column(nullable = false,name = "role_name")
    private String roleName;
 }

@@ -23,13 +23,8 @@ public class AuthService {
     private final UserRepo userRepo;
 
     public boolean loginAuth(LoginDto loginDto) {
-
-        UserDetails userDetails = userDetailService.loadUserByUsername(loginDto.username());
-        if (passwordEncoder.matches(loginDto.password(), userDetails.getPassword())) {
-            return true;
-        } else {
-            return false;
-        }
+        UserDetails userDetails = userDetailService.loadUserByUsername(loginDto.email());
+        return passwordEncoder.matches(loginDto.password(), userDetails.getPassword());
     }
 
     public boolean signupService(SignupDto signupDto) {
