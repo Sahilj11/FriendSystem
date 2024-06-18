@@ -12,11 +12,13 @@ import com.example.credit.security.service.AuthService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /** AuthController */
 @Controller
 @RequestMapping(path = "/auth/")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
 
     private final AuthService authService;
@@ -27,12 +29,9 @@ public class AuthController {
     }
 
     @PostMapping(path = "login")
-    public String login(@Valid @ModelAttribute LoginDto loginDto) {
-        if (authService.loginAuth(loginDto)) {
-            return "home";
-        } else {
-            return "loginform";
-        }
+    public void login(@ModelAttribute LoginDto loginDto) {
+        log.info(loginDto.email());
+        authService.loginAuth(loginDto);
     }
 
     @GetMapping(path = "signup")

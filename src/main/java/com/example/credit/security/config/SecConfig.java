@@ -10,6 +10,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * SecConfig
  */
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import com.example.credit.security.config.handlers.CustomAuthSuccessHandler;
+import com.example.credit.security.config.handlers.CustomLogoutHandler;
 
 @Configuration
 public class SecConfig {
@@ -18,12 +22,15 @@ public class SecConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(AbstractHttpConfigurer::disable);
         http.csrf(AbstractHttpConfigurer::disable);
-        http.authorizeHttpRequests(req -> 
-                req.requestMatchers("/auth/signup").permitAll()
+        http.authorizeHttpRequests(req -> req.requestMatchers("/auth/signup").permitAll()
                 .requestMatchers("/css/**").permitAll()
-                .anyRequest().authenticated());
+                .anyRequest().hasAuthority("FREE"));
 
-        http.formLogin(login -> login.loginPage("/auth/login").permitAll());
+        http.formLogin(
+                login -> login.loginPage("/auth/login").usernameParameter("email").loginProcessingUrl("/auth/login")
+                        .permitAll().successHandler(new CustomAuthSuccessHandler()));
+        http.logout(logout -> logout
+                .logoutSuccessHandler(new CustomLogoutHandler()));
         return http.build();
     }
 

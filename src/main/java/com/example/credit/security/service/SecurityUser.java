@@ -11,11 +11,13 @@ import com.example.credit.entities.RoleEntity;
 import com.example.credit.entities.UserEntity;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * CustomUserDetail
  */
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityUser implements UserDetails{
 
     private final UserEntity userEntity;
@@ -23,6 +25,7 @@ public class SecurityUser implements UserDetails{
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         RoleEntity roles = userEntity.getRole();
+        log.info(roles.toString());
         return List.of(new SimpleGrantedAuthority(roles.getRoleName()));
     }
 

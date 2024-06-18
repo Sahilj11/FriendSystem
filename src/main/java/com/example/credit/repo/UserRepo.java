@@ -6,6 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 /** UserRepo */
 public interface UserRepo extends JpaRepository<UserEntity, Integer> {
-
     Optional<UserEntity> findByEmail(String email);
 }
