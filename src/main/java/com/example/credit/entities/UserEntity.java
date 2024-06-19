@@ -16,7 +16,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** UserEntity */
+/**
+ * Maps to users table {@link ManyToOne} with {@link RoleEntity}
+ */
 @Entity
 @Table(name = "users")
 @Getter

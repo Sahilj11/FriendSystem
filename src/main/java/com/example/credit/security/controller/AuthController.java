@@ -1,18 +1,17 @@
 package com.example.credit.security.controller;
 
+import com.example.credit.security.dto.LoginDto;
+import com.example.credit.security.dto.SignupDto;
+import com.example.credit.security.service.AuthService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import com.example.credit.security.dto.LoginDto;
-import com.example.credit.security.dto.SignupDto;
-import com.example.credit.security.service.AuthService;
-
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 /** AuthController */
 @Controller
@@ -45,8 +44,9 @@ public class AuthController {
             return "signupform";
         }
         if (authService.signupService(signupDto)) {
-            return "home";
+            return "redirect:/home";
+        } else {
+            return "signupform";
         }
-        return "signupform";
     }
 }

@@ -2,6 +2,8 @@ package com.example.credit.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -10,10 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * SecConfig
  */
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.example.credit.security.config.handlers.CustomAuthSuccessHandler;
-import com.example.credit.security.config.handlers.CustomLogoutHandler;
 
 @Configuration
 public class SecConfig {
@@ -23,14 +23,13 @@ public class SecConfig {
         http.cors(AbstractHttpConfigurer::disable);
         http.csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests(req -> req.requestMatchers("/auth/signup").permitAll()
-                .requestMatchers("/css/**").permitAll()
+                .requestMatchers("/css/**").permitAll().requestMatchers("/auth/login?logout").permitAll()
                 .anyRequest().hasAuthority("FREE"));
 
         http.formLogin(
                 login -> login.loginPage("/auth/login").usernameParameter("email").loginProcessingUrl("/auth/login")
                         .permitAll().successHandler(new CustomAuthSuccessHandler()));
-        http.logout(logout -> logout
-                .logoutSuccessHandler(new CustomLogoutHandler()));
+        http.logout(logout -> logout.logoutUrl("/auth/logout"));
         return http.build();
     }
 
@@ -38,5 +37,5 @@ public class SecConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
+    
 }

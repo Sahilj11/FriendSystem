@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /** CustomLogoutHandler */
 @Slf4j
-public class CustomLogoutHandler implements LogoutSuccessHandler {
+public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
 
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)

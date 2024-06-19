@@ -3,7 +3,12 @@ package com.example.credit.security.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
-/** SignupDto */
+/** SignupDto
+ * @param name 
+ * @param password 
+ * @param confirmPass 
+ * @param agreeterms stores boolean
+ */
 public record SignupDto(
         @NotNull(message = "Name cannot be empty") String name,
         @NotNull(message = "password cannot be empty") String password,
