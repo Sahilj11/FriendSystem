@@ -1,20 +1,17 @@
 package com.example.credit.security.service;
 
-import com.example.credit.entities.UserEntity;
-import com.example.credit.repo.RoleRepo;
-import com.example.credit.repo.UserRepo;
-import com.example.credit.security.dto.LoginDto;
-import com.example.credit.security.dto.SignupDto;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.example.credit.entities.UserEntity;
+import com.example.credit.repo.RoleRepo;
+import com.example.credit.repo.UserRepo;
+import com.example.credit.security.domain.LoginDto;
+import com.example.credit.security.domain.SignupDto;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /** AuthService. * */
 @Service

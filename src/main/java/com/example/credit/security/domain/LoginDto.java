@@ -1,4 +1,4 @@
-package com.example.credit.security.dto;
+package com.example.credit.security.domain;
 
 /** LoginDto
  *  @param email and password

@@ -2,8 +2,6 @@ package com.example.credit.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,6 +22,7 @@ public class SecConfig {
         http.csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests(req -> req.requestMatchers("/auth/signup").permitAll()
                 .requestMatchers("/css/**").permitAll().requestMatchers("/auth/login?logout").permitAll()
+                .requestMatchers("/api/search/**").permitAll()
                 .anyRequest().hasAuthority("FREE"));
 
         http.formLogin(
