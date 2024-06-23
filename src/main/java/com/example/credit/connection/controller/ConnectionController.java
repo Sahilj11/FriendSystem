@@ -20,6 +20,7 @@ public class ConnectionController {
 
     private final AutoComplete aComplete;
 
+    // TODO: what will be the case if no search query is there
     @GetMapping(path = "")
     public ResponseEntity<List<String>> searchUser(@RequestParam(required = true) String q) {
          return aComplete.searchList(q);

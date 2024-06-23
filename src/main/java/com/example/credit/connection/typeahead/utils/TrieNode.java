@@ -1,11 +1,9 @@
-package com.example.credit.connection.service;
+package com.example.credit.connection.typeahead.utils;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 
-/** TrieNode */
 @Slf4j
 public class TrieNode {
 

@@ -1,9 +1,10 @@
 package com.example.credit.connection.service;
 
-import com.example.credit.connection.schedule.TrieGeneratorService;
+import com.example.credit.connection.typeahead.schedule.TrieGeneratorService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.example.credit.connection.typeahead.utils.TrieNode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
