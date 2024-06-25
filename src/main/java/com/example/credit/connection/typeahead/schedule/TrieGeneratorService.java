@@ -24,7 +24,8 @@ public class TrieGeneratorService {
      *
      * @return refernce to the root of new generated trie
      */
-    @Scheduled(fixedDelay = 10000)
+    //@Scheduled(cron = "0 0 0 * * SUN")
+    @Scheduled(fixedDelay = 100000)
     public TrieNode trieGenerate() {
         TrieNode newRoot = new TrieNode();
         String[] names = userRepo.findAll().stream().map(UserEntity::getName).toArray(String[]::new);
