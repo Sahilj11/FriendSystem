@@ -51,6 +51,7 @@ public class TrieNode {
      */
     public List<String> search(TrieNode root, String prefix) {
         prefix = prefix.replaceAll("\\s+", "").toLowerCase();
+        log.warn(prefix);
         TrieNode curNode = root;
         for (int i = 0; i < prefix.length(); i++) {
             char c = prefix.charAt(i);
