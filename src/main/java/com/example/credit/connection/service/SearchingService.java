@@ -1,5 +1,6 @@
 package com.example.credit.connection.service;
 
+import com.example.credit.connection.dto.UserListDto;
 import com.example.credit.connection.typeahead.schedule.TrieGeneratorService;
 import com.example.credit.connection.typeahead.utils.TrieNode;
 import com.example.credit.entities.UserEntity;
@@ -38,14 +39,22 @@ public class SearchingService {
         }
     }
 
-    public ResponseEntity<List<String>> userList(Pageable pageable, String q) {
+    // TODO: need to return something other than sql id
+    /**
+     * Method for fetching list of users matching the query , pagination is applied
+     *
+     * @param pageable object contains page number and size of page
+     * @param q Search query
+     * @return Provide list of {@link UserListDto} and null if no such users.
+     */
+    public ResponseEntity<List<UserListDto>> userList(Pageable pageable, String q) {
         List<UserEntity> byNameLike = userRepo.findByNameLike(q, pageable);
         if (byNameLike.isEmpty()) {
             return null;
         }else{
-            List<String> uList = new ArrayList<>();
+            List<UserListDto> uList = new ArrayList<>();
             for (UserEntity user : byNameLike) {
-                uList.add(user.getName());
+                uList.add(new UserListDto(user.getUserId(),user.getName(),user.getEmail()));
             }
             return ResponseEntity.ok(uList);
         }
