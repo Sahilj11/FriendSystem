@@ -34,7 +34,6 @@ public class ConnectionController {
         if (q.length() == 0 || InputVal.queryInvalid(q)) {
             return ResponseEntity.ok(new ArrayList<>());
         }
-        log.warn("Query " + q);
         return searching.taList(q);
     }
 

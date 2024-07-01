@@ -3,6 +3,12 @@ package com.example.credit.connection.typeahead.utils;
 /** TitleCase */
 public class TitleCase {
 
+    /**
+     * Convert String to titlecase use StringBuilder
+     *
+     * @param q Input string
+     * @return Titlecased String
+     */
     public static String titleString(String q) {
         String[] words = q.split("\\s+");
         StringBuilder res = new StringBuilder();

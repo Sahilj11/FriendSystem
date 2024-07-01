@@ -51,7 +51,6 @@ public class TrieNode {
      * @return List of 5 words that starts with prefix
      */
     public List<String> search(TrieNode root, String prefix) {
-        log.warn("This is prefix " + prefix);
         prefix = prefix.toLowerCase();
         TrieNode curNode = root;
         for (int i = 0; i < prefix.length(); i++) {
@@ -103,7 +102,6 @@ public class TrieNode {
 
     private int getIndex(char c) {
         if (c == ' ') {
-            log.warn("This is a space");
             return 26;
         } else {
             return c - 'a';

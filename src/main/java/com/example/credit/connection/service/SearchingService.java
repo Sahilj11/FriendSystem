@@ -24,7 +24,7 @@ public class SearchingService {
     private final UserRepo userRepo;
 
     /**
-     * method for getting list of similar username for matching query
+     * method for getting list of similar username for matching query in title casing
      *
      * @param query search parameter
      */
@@ -34,7 +34,6 @@ public class SearchingService {
             log.error("Trie not generated");
             return ResponseEntity.ok(List.of("Empty"));
         } else {
-            log.warn("This is query" + query);
             List<String> search = root.search(root, query);
             if (search.isEmpty()) {
                 return ResponseEntity.ok(search);
