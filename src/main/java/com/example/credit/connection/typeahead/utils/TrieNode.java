@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TrieNode {
 
-    private static final int ALPHABET_SIZE = 26;
+    private static final int ALPHABET_SIZE = 27;
     private boolean eow;
     private TrieNode[] children;
     private String word;
@@ -21,6 +21,7 @@ public class TrieNode {
         }
     }
 
+    // TODO: Add spaces into the trie
     /**
      * Insert word into trie
      *
@@ -28,15 +29,15 @@ public class TrieNode {
      * @param word word need to be inserted
      */
     public void insert(TrieNode root, String word) {
-        word = word.replaceAll("\\s+", "").toLowerCase();
+        word = word.toLowerCase();
         TrieNode curr = root;
         for (int i = 0; i < word.length(); i++) {
             char c = word.charAt(i);
-            if (curr.children[c - 'a'] == null) {
-                TrieNode addNode = new TrieNode();
-                curr.children[c - 'a'] = addNode;
+            int index = getIndex(c);
+            if (curr.children[index] == null) {
+                curr.children[index] = new TrieNode();
             }
-            curr = curr.children[c - 'a'];
+            curr = curr.children[index];
         }
         curr.eow = true;
         curr.word = word;
@@ -50,18 +51,19 @@ public class TrieNode {
      * @return List of 5 words that starts with prefix
      */
     public List<String> search(TrieNode root, String prefix) {
-        prefix = prefix.replaceAll("\\s+", "").toLowerCase();
-        log.warn(prefix);
+        log.warn("This is prefix " + prefix);
+        prefix = prefix.toLowerCase();
         TrieNode curNode = root;
         for (int i = 0; i < prefix.length(); i++) {
             char c = prefix.charAt(i);
-            if (curNode.children[c - 'a'] == null) {
+            int index = getIndex(c);
+            if (curNode.children[index] == null) {
                 return new ArrayList<>();
             }
-            curNode = curNode.children[c - 'a'];
+            curNode = curNode.children[index];
         }
         List<String> results = new ArrayList<>();
-        collectWords(curNode, results, 0);
+        collectWords(curNode, results);
         return results;
     }
 
@@ -70,19 +72,17 @@ public class TrieNode {
      *
      * @param curNode Pointer to current node
      * @param result  Array holding 5 string
-     * @param i       counter to ensure only 5 words are added
      */
-    private static void collectWords(TrieNode curNode, List<String> result, int i) {
-        if (curNode == null || i > 5) {
+    private void collectWords(TrieNode curNode, List<String> result) {
+        if (curNode == null || result.size() == 5) {
             return;
         }
         if (curNode.eow) {
             result.add(curNode.word);
-            i++;
         }
         for (int j = 0; j < ALPHABET_SIZE; j++) {
             if (curNode.children[j] != null) {
-                collectWords(curNode.children[j], result, i);
+                collectWords(curNode.children[j], result);
             }
         }
     }
@@ -98,6 +98,15 @@ public class TrieNode {
             if (curNode.children[j] != null) {
                 printAll(curNode.children[j]);
             }
+        }
+    }
+
+    private int getIndex(char c) {
+        if (c == ' ') {
+            log.warn("This is a space");
+            return 26;
+        } else {
+            return c - 'a';
         }
     }
 }

@@ -3,6 +3,8 @@ package com.example.credit.connection.controller;
 import com.example.credit.connection.dto.UserListDto;
 import com.example.credit.connection.service.SearchingService;
 import com.example.credit.utils.inputvalidation.InputVal;
+
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,12 +29,12 @@ public class ConnectionController {
     private final SearchingService searching;
 
     // TODO: what will be the case if no search query is there
-    // TODO: return list of user
     @GetMapping(path = "search/ta")
-    public ResponseEntity<List<String>> searchUser(@RequestParam(required = true) String q) {
+    public ResponseEntity<List<String>> searchUser(@RequestParam String q) {
         if (q.length() == 0 || InputVal.queryInvalid(q)) {
-            return null;
+            return ResponseEntity.ok(new ArrayList<>());
         }
+        log.warn("Query " + q);
         return searching.taList(q);
     }
 

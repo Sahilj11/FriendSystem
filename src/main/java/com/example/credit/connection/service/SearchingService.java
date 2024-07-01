@@ -34,6 +34,7 @@ public class SearchingService {
             log.error("Trie not generated");
             return ResponseEntity.ok(List.of("Empty"));
         } else {
+            log.warn("This is query" + query);
             List<String> search = root.search(root, query);
             return ResponseEntity.ok(search);
         }

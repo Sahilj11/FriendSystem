@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
  */
 public class InputVal {
 
-    private static final String searchQRegex = ".*[0-9\\W_].*";
+    private static final String searchQRegex = ".*[0-9\\W_&&[^\\s]].*";
     /**
      * Checks if input contains digits or special character
      *
