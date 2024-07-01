@@ -2,10 +2,10 @@ package com.example.credit.connection.service;
 
 import com.example.credit.connection.dto.UserListDto;
 import com.example.credit.connection.typeahead.schedule.TrieGeneratorService;
+import com.example.credit.connection.typeahead.utils.TitleCase;
 import com.example.credit.connection.typeahead.utils.TrieNode;
 import com.example.credit.entities.UserEntity;
 import com.example.credit.repo.UserRepo;
-
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +36,13 @@ public class SearchingService {
         } else {
             log.warn("This is query" + query);
             List<String> search = root.search(root, query);
+            if (search.isEmpty()) {
+                return ResponseEntity.ok(search);
+            }
+            for (int i = 0; i < search.size(); i++) {
+                String temp = TitleCase.titleString(search.get(i));
+                search.set(i, temp);
+            }
             return ResponseEntity.ok(search);
         }
     }
@@ -45,17 +52,17 @@ public class SearchingService {
      * Method for fetching list of users matching the query , pagination is applied
      *
      * @param pageable object contains page number and size of page
-     * @param q Search query
+     * @param q        Search query
      * @return Provide list of {@link UserListDto} and null if no such users.
      */
     public ResponseEntity<List<UserListDto>> userList(Pageable pageable, String q) {
         List<UserEntity> byNameLike = userRepo.findByNameLike(q, pageable);
         if (byNameLike.isEmpty()) {
             return null;
-        }else{
+        } else {
             List<UserListDto> uList = new ArrayList<>();
             for (UserEntity user : byNameLike) {
-                uList.add(new UserListDto(user.getUserId(),user.getName(),user.getEmail()));
+                uList.add(new UserListDto(user.getUserId(), user.getName(), user.getEmail()));
             }
             return ResponseEntity.ok(uList);
         }
