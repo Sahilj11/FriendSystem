@@ -1,5 +1,6 @@
 package com.example.credit.connection.controller;
 
+import com.example.credit.connection.dto.TypeAheadDto;
 import com.example.credit.connection.dto.UserListDto;
 import com.example.credit.connection.service.SearchingService;
 import com.example.credit.utils.inputvalidation.InputVal;
@@ -29,14 +30,28 @@ public class ConnectionController {
     private final SearchingService searching;
 
     // TODO: what will be the case if no search query is there
+    /**
+     * Provide list of name like the query string use trie
+     *
+     * @param q Query string
+     * @return List of names like q
+     */
     @GetMapping(path = "search/ta")
-    public ResponseEntity<List<String>> searchUser(@RequestParam String q) {
+    public ResponseEntity<List<TypeAheadDto>> searchUser(@RequestParam String q) {
         if (q.length() == 0 || InputVal.queryInvalid(q)) {
             return ResponseEntity.ok(new ArrayList<>());
         }
         return searching.taList(q);
     }
 
+    /**
+     * Endpoint to get list of users
+     *
+     * @param q Query String
+     * @param page Page number
+     * @param size Size of each page
+     * @return {@link UserListDto} contains id name and email
+     */
     @GetMapping(path = "search")
     public ResponseEntity<List<UserListDto>> searchUserList(
             @RequestParam(required = true) String q,

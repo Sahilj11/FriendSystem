@@ -1,11 +1,15 @@
 package com.example.credit.connection.service;
 
+import com.example.credit.connection.dto.TypeAheadDto;
 import com.example.credit.connection.dto.UserListDto;
 import com.example.credit.connection.typeahead.schedule.TrieGeneratorService;
 import com.example.credit.connection.typeahead.utils.TitleCase;
 import com.example.credit.connection.typeahead.utils.TrieNode;
 import com.example.credit.entities.UserEntity;
 import com.example.credit.repo.UserRepo;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -28,21 +32,33 @@ public class SearchingService {
      *
      * @param query search parameter
      */
-    public ResponseEntity<List<String>> taList(String query) {
+    public ResponseEntity<List<TypeAheadDto>> taList(String query) {
         TrieNode root = tService.getRoot();
         if (root == null) {
             log.error("Trie not generated");
-            return ResponseEntity.ok(List.of("Empty"));
+            return ResponseEntity.ok(null);
         } else {
             List<String> search = root.search(root, query);
+            List<TypeAheadDto> tAheadDtos = new ArrayList<>();
+            String baseUrl = "http://localhost:8080/api/search?q=";
             if (search.isEmpty()) {
-                return ResponseEntity.ok(search);
+                return ResponseEntity.ok(null);
             }
             for (int i = 0; i < search.size(); i++) {
+                String encodedSearchTerm;
+                try {
+                    encodedSearchTerm =URLEncoder.encode(search.get(i),"UTF-8").replace("+", "%20");
+                } catch (UnsupportedEncodingException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    continue;
+                }
+                String encodedUrl = baseUrl + encodedSearchTerm;
                 String temp = TitleCase.titleString(search.get(i));
-                search.set(i, temp);
+                TypeAheadDto tDto = new TypeAheadDto(i, temp, encodedUrl);
+                tAheadDtos.add(tDto);
             }
-            return ResponseEntity.ok(search);
+            return ResponseEntity.ok(tAheadDtos);
         }
     }
 
