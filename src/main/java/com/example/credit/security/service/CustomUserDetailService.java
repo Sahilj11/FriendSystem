@@ -29,6 +29,7 @@ public class CustomUserDetailService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        log.info("Username entered by user is "+ username);
         Optional<UserEntity> user = usRepo.findByEmail(username);
         log.info(user.toString());
         try {
