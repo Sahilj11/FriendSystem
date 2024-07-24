@@ -29,26 +29,22 @@ public class JwtFilter extends OncePerRequestFilter {
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
-        if (authHeader != null) {
-            if (JwtUtil.validHeader(authHeader)) {
-                String token = authHeader.substring(7).trim();
-                log.info("JWT TOKEN " + token);
+        if (authHeader != null && JwtUtil.validHeader(authHeader) != false) {
+            String token = authHeader.substring(7).trim();
+            if (!JwtUtil.isTokenExpired(token)) {
                 String email = JwtUtil.extractEmail(token);
-                log.info("EMAIL  " + email);
-                if (email != null) {
+                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    log.info("EMAIL  " + email);
                     try {
                         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-                        if (!JwtUtil.isTokenExpired(token)) {
-                            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                                    email, null, userDetails.getAuthorities());
-                            auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                            SecurityContextHolder.getContext().setAuthentication(auth);
-                        }
+                        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(email, null,
+                                userDetails.getAuthorities());
+                        auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(auth);
                     } catch (Exception e) {
-                        log.warn("Issue in JwtFilter " + e);
+                        log.warn("Issue in loading username or setting authentication context " + e.getMessage());
                     }
                 }
-                filterChain.doFilter(request, response);
             }
         }
         filterChain.doFilter(request, response);
