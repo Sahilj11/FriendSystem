@@ -4,7 +4,6 @@ import com.example.credit.connection.dto.TypeAheadDto;
 import com.example.credit.connection.dto.UserListDto;
 import com.example.credit.connection.service.SearchingService;
 import com.example.credit.utils.inputvalidation.InputVal;
-
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +12,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,7 +45,7 @@ public class ConnectionController {
     /**
      * Endpoint to get list of users
      *
-     * @param q Query String
+     * @param q    Query String
      * @param page Page number
      * @param size Size of each page
      * @return {@link UserListDto} contains id name and email
@@ -69,5 +68,11 @@ public class ConnectionController {
                 return searching.userList(pageable, q);
             }
         }
+    }
+
+    // TODO: make profile url for each user
+    // TODO: endpoint to set connection request must contain identifier for sender and receiver
+    @PostMapping(path = "freq")
+    public void connectioReq() {
     }
 }

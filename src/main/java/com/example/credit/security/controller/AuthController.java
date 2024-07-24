@@ -6,7 +6,8 @@ import com.example.credit.security.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,21 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final AuthenticationManager authenticationManager;
 
     // TODO: add param to url after user logout like login?logout
     @PostMapping(path = "login")
-    public String login(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
         log.info("Email entered by user is " + loginDto.email());
-        if (authService.loginAuth(loginDto)) {
-            return "Login success";
-        } else {
-            return "Login failed";
-        }
-    }
-
-    @GetMapping(path = "signup")
-    public String signup() {
-        return "sign";
+        return authService.loginAuth(loginDto);
     }
 
     // TODO: redirect user to home page after account created

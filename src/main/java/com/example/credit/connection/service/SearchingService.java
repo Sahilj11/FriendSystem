@@ -7,9 +7,6 @@ import com.example.credit.connection.typeahead.utils.TitleCase;
 import com.example.credit.connection.typeahead.utils.TrieNode;
 import com.example.credit.entities.UserEntity;
 import com.example.credit.repo.UserRepo;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 
 /** AutoComplete */
 @Service
@@ -28,34 +26,38 @@ public class SearchingService {
     private final UserRepo userRepo;
 
     /**
-     * method for getting list of similar username for matching query in title casing
-     *
+     * Provides List of user having name similar to query , it use {@link TrieNode}
+     * to search thru the user.
+     * Before generating {@link TypeAheadDto} result names are converted to TitleCase.
+     * It also Generates search url for each user found.
+     * If no user is found it returns null.
      * @param query search parameter
+     * @return {@link TypeAheadDto} which contains name , id , searchUrl.
      */
     public ResponseEntity<List<TypeAheadDto>> taList(String query) {
         TrieNode root = tService.getRoot();
+        log.info("Search Query of user " + query);
         if (root == null) {
             log.error("Trie not generated");
             return ResponseEntity.ok(null);
         } else {
             List<String> search = root.search(root, query);
             List<TypeAheadDto> tAheadDtos = new ArrayList<>();
-            String baseUrl = "http://localhost:8080/api/search?q=";
+            String baseUrl = UriComponentsBuilder.fromPath(
+                "http://localhost:8080/api/search"
+            )
+                .queryParam("q", query)
+                .queryParam("page", 0)
+                .queryParam("size", 10)
+                .encode()
+                .build()
+                .toUriString();
             if (search.isEmpty()) {
                 return ResponseEntity.ok(null);
             }
             for (int i = 0; i < search.size(); i++) {
-                String encodedSearchTerm;
-                try {
-                    encodedSearchTerm =URLEncoder.encode(search.get(i),"UTF-8").replace("+", "%20");
-                } catch (UnsupportedEncodingException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    continue;
-                }
-                String encodedUrl = baseUrl + encodedSearchTerm;
                 String temp = TitleCase.titleString(search.get(i));
-                TypeAheadDto tDto = new TypeAheadDto(i, temp, encodedUrl);
+                TypeAheadDto tDto = new TypeAheadDto(i, temp, baseUrl);
                 tAheadDtos.add(tDto);
             }
             return ResponseEntity.ok(tAheadDtos);
@@ -64,20 +66,31 @@ public class SearchingService {
 
     // TODO: need to return something other than sql id
     /**
-     * Method for fetching list of users matching the query , pagination is applied
+     * Method for fetching list of users matching the query , pagination is applied.
+     * Url example
+     * /api/search?q=example&page=0&size=10
      *
      * @param pageable object contains page number and size of page
      * @param q        Search query
      * @return Provide list of {@link UserListDto} and null if no such users.
      */
-    public ResponseEntity<List<UserListDto>> userList(Pageable pageable, String q) {
+    public ResponseEntity<List<UserListDto>> userList(
+        Pageable pageable,
+        String q
+    ) {
         List<UserEntity> byNameLike = userRepo.findByNameLike(q, pageable);
         if (byNameLike.isEmpty()) {
             return null;
         } else {
             List<UserListDto> uList = new ArrayList<>();
             for (UserEntity user : byNameLike) {
-                uList.add(new UserListDto(user.getUserId(), user.getName(), user.getEmail()));
+                uList.add(
+                    new UserListDto(
+                        user.getUserId(),
+                        user.getName(),
+                        user.getEmail()
+                    )
+                );
             }
             return ResponseEntity.ok(uList);
         }
