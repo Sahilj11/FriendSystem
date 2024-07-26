@@ -22,7 +22,7 @@ public class CustomUserDetailService implements UserDetailsService {
     private final UserRepo usRepo;
 
     /**
-     * Loading user from data base
+     * Loading user from database, find user details using email entered.
      * @param username getting user email as input
      * @return provides {@link SecurityUser} object
      * @throws UsernameNotFoundException 

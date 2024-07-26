@@ -16,8 +16,6 @@ public class JwtUtil {
     private static final String jwtKey = "BBwEyUjed9tXB24+L+r4O3AHg4BLmqSYm9SAuAMST1Y=";
     private static final int validDate = 1728000000;
 
-    // TODO: Generate jwt using the email , it is done after correct email and
-    // password is entered
     public static String generateToken(String username, String email) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", email);
@@ -36,18 +34,6 @@ public class JwtUtil {
 
     private static SecretKey generateKey() {
         return Keys.hmacShaKeyFor(jwtKey.getBytes());
-    }
-
-    public static boolean validateToken(String jwtToken) {
-        try {
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-        return false;
-    }
-
-    public static String getToken(String token) {
-        return "";
     }
 
     public static boolean validHeader(String headerAuth) {
