@@ -3,22 +3,29 @@ package com.example.credit.utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.crypto.SecretKey;
+
 import lombok.extern.slf4j.Slf4j;
 
-/** JwtUtils */
+import static java.lang.Integer.*;
+
+/**
+ * JwtUtils
+ */
 @Slf4j
 public class JwtUtil {
 
     private static final String jwtKey = "BBwEyUjed9tXB24+L+r4O3AHg4BLmqSYm9SAuAMST1Y=";
     private static final int validDate = 1728000000;
 
-    public static String generateToken(String username, String email) {
+    public static String generateToken(String username, String email, int uId) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", email);
+        claims.put("uId", uId);
         return createToken(username, claims);
     }
 
@@ -47,6 +54,16 @@ public class JwtUtil {
 
     public static String extractEmail(String token) {
         return extractAllClaims(token).get("email").toString();
+    }
+
+    public static int extractId(String token) {
+        String id = extractAllClaims(token).get("uId").toString();
+        try {
+            return Integer.parseInt(id);
+        } catch (NumberFormatException ne) {
+            log.warn("Entered uID value {} is not a number", id);
+            return -1;
+        }
     }
 
     private static Date extractExpiration(String token) {

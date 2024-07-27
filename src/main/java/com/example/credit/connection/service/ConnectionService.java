@@ -1,5 +1,6 @@
 package com.example.credit.connection.service;
 
+import com.example.credit.connection.dto.FriendReqResponse;
 import com.example.credit.connection.dto.TypeAheadDto;
 import com.example.credit.connection.dto.UserListDto;
 import com.example.credit.connection.typeahead.schedule.TrieGeneratorService;
@@ -98,6 +99,7 @@ public class ConnectionService {
         }
     }
 
+    // TODO: Handle Exception handling.
     public void sendFriendReq(int uid2) {
         log.warn("" + uid2);
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -138,5 +140,10 @@ public class ConnectionService {
         } catch (Exception e) {
             log.warn("Something bad happended");
         }
+    }
+
+    public void acceptFriendReq(FriendReqResponse friendReqResponse , int userId){
+        
+       return;
     }
 }
