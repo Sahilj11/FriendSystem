@@ -5,12 +5,9 @@ import com.example.credit.connection.dto.FriendReqResponse;
 import com.example.credit.connection.dto.TypeAheadDto;
 import com.example.credit.connection.dto.UserListDto;
 import com.example.credit.connection.service.ConnectionService;
+import com.example.credit.connection.service.FriendRequestService;
 import com.example.credit.utils.JwtUtil;
 import com.example.credit.utils.inputvalidation.InputVal;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * ConnectionController
@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 public class ConnectionController {
 
     private final ConnectionService connService;
+    private final FriendRequestService friendRequestService;
 
     // TODO: what will be the case if no search query is there
 
@@ -81,20 +82,25 @@ public class ConnectionController {
         String authHeader = request.getHeader("Authorization");
         String token = authHeader.substring(7).trim();
         int uId = JwtUtil.extractId(token);
-        connService.sendFriendReq(friendReqDto.receiverId(),uId);
+        friendRequestService.sendFriendReq(friendReqDto.receiverId(), uId);
     }
 
     @PutMapping(path = "freq")
-    public void actOnRequest(@RequestParam() int userId, @RequestParam() FriendReqResponse action){
-        switch (action){
+    public void actOnRequest(@RequestParam int userId, @RequestParam FriendReqResponse action, HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        String token = authHeader.substring(7).trim();
+        int loggedId = JwtUtil.extractId(token);
+        switch (action) {
             case ACCEPT:
-                log.warn("Request accepted of {}",userId);
+                log.warn("Request accepted of {}", userId);
+                friendRequestService.acceptFriendReq(userId, loggedId);
                 break;
             case DENY:
-                log.warn("Request denied of {}",userId);
+                log.warn("Request denied of {}", userId);
+                friendRequestService.rejectFriendReq(userId,loggedId);
                 break;
             default:
-                throw new IllegalArgumentException("Invalid action: "+action);
+                throw new IllegalArgumentException("Invalid action: " + action);
         }
     }
 }
