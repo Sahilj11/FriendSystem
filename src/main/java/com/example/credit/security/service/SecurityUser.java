@@ -39,6 +39,8 @@ public class SecurityUser implements UserDetails{
         return userEntity.getName();
     }
 
+    public int getUserID(){return userEntity.getUserId();}
+
     @Override
     public boolean isAccountNonExpired() {
         return true;

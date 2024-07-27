@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,13 +34,14 @@ public class AuthService {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginDto.email(), loginDto.password()));
-            UserDetails uDetails = userDetailsService.loadUserByUsername(loginDto.email());
+            SecurityUser uDetails = (SecurityUser) userDetailsService.loadUserByUsername(loginDto.email());
             String username = uDetails.getUsername();
-            String jwtToken = JwtUtil.generateToken(username, loginDto.email());
-            return new ResponseEntity<String>(jwtToken, HttpStatus.OK);
+            int uId = uDetails.getUserID();
+            String jwtToken = JwtUtil.generateToken(username, loginDto.email(),uId);
+            return new ResponseEntity<>(jwtToken, HttpStatus.OK);
         } catch (Exception e) {
-            log.warn("Exception occured while authentication " + e.getMessage());
-            return new ResponseEntity<String>("Incorrect Credentials", HttpStatus.BAD_REQUEST);
+            log.warn("Exception occured while authentication {}", e.getMessage());
+            return new ResponseEntity<>("Incorrect Credentials", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -53,16 +53,17 @@ public class AuthService {
             uEntity.setPassword(passwordEncoder.encode(signupDto.password()));
             uEntity.setRole(roleRepo.findByRoleName("FREE"));
             userRepo.save(uEntity);
-            String jwtToken = JwtUtil.generateToken(signupDto.name(), signupDto.email());
+            int uId = uEntity.getUserId();
+            String jwtToken = JwtUtil.generateToken(signupDto.name(), signupDto.email(),uId);
             return new ResponseEntity<>(jwtToken, HttpStatus.CREATED);
         } catch (DataIntegrityViolationException e) {
             if (e.getCause() instanceof ConstraintViolationException) {
-                log.warn("Email id " + signupDto.email() + " already in use.\n" + e.getMessage());
+                log.warn("Email id {} already in use.\n{}", signupDto.email(), e.getMessage());
                 return new ResponseEntity<>("Email id already in use.", HttpStatus.BAD_REQUEST);
             }
                 return new ResponseEntity<>("Some issue with values entered.", HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            log.warn("Error occured while creating new account " + e.getMessage());
+            log.warn("Error occured while creating new account {}", e.getMessage());
             return new ResponseEntity<>("Something bad happended , Please try again.", HttpStatus.BAD_REQUEST);
         }
     }
@@ -78,8 +79,6 @@ public class AuthService {
             return true;
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
-            return false;
-        return true;
+        return getClass() == obj.getClass();
     }
 }
