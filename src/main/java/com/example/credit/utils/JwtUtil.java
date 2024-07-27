@@ -3,15 +3,12 @@ package com.example.credit.utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 
+import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import javax.crypto.SecretKey;
-
-import lombok.extern.slf4j.Slf4j;
-
-import static java.lang.Integer.*;
 
 /**
  * JwtUtils
@@ -19,6 +16,7 @@ import static java.lang.Integer.*;
 @Slf4j
 public class JwtUtil {
 
+    @SuppressWarnings("SpellCheckingInspection")
     private static final String jwtKey = "BBwEyUjed9tXB24+L+r4O3AHg4BLmqSYm9SAuAMST1Y=";
     private static final int validDate = 1728000000;
 
@@ -44,8 +42,9 @@ public class JwtUtil {
     }
 
     public static boolean validHeader(String headerAuth) {
-        log.info(headerAuth);
-        return headerAuth.startsWith("Bearer ") && headerAuth.length() > 7;
+        if (headerAuth.startsWith("Bearer ") && headerAuth.length() > 7) return true;
+        log.warn("Header provided {}", headerAuth);
+        return false;
     }
 
     private static Claims extractAllClaims(String token) {

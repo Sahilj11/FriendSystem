@@ -10,11 +10,6 @@ import com.example.credit.entities.Friend_request;
 import com.example.credit.entities.UserEntity;
 import com.example.credit.repo.FriendReqRepo;
 import com.example.credit.repo.UserRepo;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +18,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * AutoComplete
@@ -38,7 +37,7 @@ public class ConnectionService {
 
     /**
      * Provides List of user having name similar to query , it use {@link TrieNode}
-     * to search thru the
+     * to search through the
      * user. Before generating {@link TypeAheadDto} result names are converted to
      * TitleCase. It also
      * Generates search url for each user found. If no user is found it returns
@@ -49,7 +48,7 @@ public class ConnectionService {
      */
     public ResponseEntity<List<TypeAheadDto>> taList(String query) {
         TrieNode root = tService.getRoot();
-        log.info("Search Query of user " + query);
+        log.info("Search Query of user {}", query);
         if (root == null) {
             log.error("Trie not generated");
             return ResponseEntity.ok(null);
@@ -100,50 +99,35 @@ public class ConnectionService {
     }
 
     // TODO: Handle Exception handling.
-    public void sendFriendReq(int uid2) {
-        log.warn("" + uid2);
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (email == null) {
-            log.warn("Email info not in JWT");
-            return;
-        }
+    public void sendFriendReq(int uid2, int uid1) {
         try {
-            Optional<UserEntity> user = userRepo.findByEmail(email);
-            if (user.isEmpty()) {
-                log.warn("Email id {} not exist in database", email);
-                throw new RuntimeException("User does not exist");
-            } else {
-                int uid1 = user.get().getUserId();
-                Friend_request friend_request = new Friend_request();
-                friend_request.setRequestor("UID1");
-                if(uid1 < uid2){
-                    if (friendReqRepo.existsByUid1(uid1)){
-                        log.warn("I Stopped sending request");
-                        return;
-                    }
-                    friend_request.setUid1(uid1);
-                    friend_request.setUid2(uid2);
-                    friend_request.setRequestor("UID1");
-                }else{
-                    if (friendReqRepo.existsByUid2(uid1)){
-                        log.warn("I Stopped sending request");
-                        return;
-                    }
-                    friend_request.setUid1(uid2);
-                    friend_request.setUid2(uid1);
-                    friend_request.setRequestor("UID2");
+            log.warn("User with id {} sending request to User with id {}", uid1,uid2);
+            Friend_request friend_request = new Friend_request();
+            friend_request.setRequestor("UID1");
+            if (uid1 < uid2) {
+                if (friendReqRepo.existsByUid1(uid1)) {
+                    log.warn("User with id {} is already friends with User with id {}",uid1,uid2);
+                    return;
                 }
-                friendReqRepo.save(friend_request);
+                friend_request.setUid1(uid1);
+                friend_request.setUid2(uid2);
+                friend_request.setRequestor("UID1");
+            } else {
+                if (friendReqRepo.existsByUid2(uid1)) {
+                    log.warn("User with id {} is already friends with User with id {}",uid1,uid2);
+                    return;
+                }
+                friend_request.setUid1(uid2);
+                friend_request.setUid2(uid1);
+                friend_request.setRequestor("UID2");
             }
-        } catch (UsernameNotFoundException e) {
-            log.warn("Email id {} not exist {}", email, e.getMessage());
-        } catch (Exception e) {
-            log.warn("Something bad happended");
+            friendReqRepo.save(friend_request);
+        }  catch (Exception e) {
+            log.warn("Issue occurred while sending friend request from userId {} to userID {}. {}",uid1,uid2,e.getMessage());
         }
     }
 
-    public void acceptFriendReq(FriendReqResponse friendReqResponse , int userId){
-        
-       return;
+    public void acceptFriendReq(FriendReqResponse friendReqResponse, int userId) {
+        return;
     }
 }

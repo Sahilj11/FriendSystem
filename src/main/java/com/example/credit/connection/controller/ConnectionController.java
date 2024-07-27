@@ -5,11 +5,13 @@ import com.example.credit.connection.dto.FriendReqResponse;
 import com.example.credit.connection.dto.TypeAheadDto;
 import com.example.credit.connection.dto.UserListDto;
 import com.example.credit.connection.service.ConnectionService;
+import com.example.credit.utils.JwtUtil;
 import com.example.credit.utils.inputvalidation.InputVal;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -40,7 +42,7 @@ public class ConnectionController {
      */
     @GetMapping(path = "search/ta")
     public ResponseEntity<List<TypeAheadDto>> searchUser(@RequestParam String q) {
-        if (q.length() == 0 || InputVal.queryInvalid(q)) {
+        if (q.isEmpty() || InputVal.queryInvalid(q)) {
             return ResponseEntity.ok(new ArrayList<>());
         }
         return connService.taList(q);
@@ -55,7 +57,7 @@ public class ConnectionController {
      * @return {@link UserListDto} contains id name and email
      */
     @GetMapping(path = "search")
-    public ResponseEntity<List<UserListDto>> searchUserList(@RequestParam(required = true) String q, @RequestParam(required = true) Integer page, @RequestParam(required = true) Integer size) {
+    public ResponseEntity<List<UserListDto>> searchUserList(@RequestParam String q, @RequestParam Integer page, @RequestParam Integer size) {
         if (page == null || size == null || InputVal.queryInvalid(q)) {
             log.warn("Cannot be null");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -66,7 +68,7 @@ public class ConnectionController {
             } else {
                 Pageable pageable = PageRequest.of(page, size);
                 log.warn(String.format("Page is %d and size is %d", page, size));
-                log.warn("User in security context " + SecurityContextHolder.getContext().getAuthentication().getName());
+                log.warn("User in security context {}", SecurityContextHolder.getContext().getAuthentication().getName());
                 return connService.userList(pageable, q);
             }
         }
@@ -75,12 +77,15 @@ public class ConnectionController {
     // TODO: make profile url for each user
     // TODO: endpoint to set connection request must contain identifier for sender and receiver
     @PostMapping(path = "freq")
-    public void connectionReq(@RequestBody FriendReqDto friendReqDto) {
-        connService.sendFriendReq(friendReqDto.receiverId());
+    public void connectionReq(@RequestBody FriendReqDto friendReqDto, HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        String token = authHeader.substring(7).trim();
+        int uId = JwtUtil.extractId(token);
+        connService.sendFriendReq(friendReqDto.receiverId(),uId);
     }
 
     @PutMapping(path = "freq")
-    public void actOnRequest(@RequestParam(required = true) int userId, @RequestParam(required = true) FriendReqResponse action){
+    public void actOnRequest(@RequestParam() int userId, @RequestParam() FriendReqResponse action){
         switch (action){
             case ACCEPT:
                 log.warn("Request accepted of {}",userId);
