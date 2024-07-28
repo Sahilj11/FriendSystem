@@ -1,5 +1,7 @@
 package com.example.credit.connection.service;
 
+import com.example.credit.connection.dto.FriendListDto;
+import com.example.credit.connection.dto.FriendReqPendingDto;
 import com.example.credit.entities.Friend_request;
 import com.example.credit.entities.User_friend;
 import com.example.credit.repo.FriendReqRepo;
@@ -7,6 +9,7 @@ import com.example.credit.repo.UserFriendRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -165,7 +168,7 @@ public class FriendRequestService {
             uid2 = temp;
         }
         log.warn("uid1 is {} and uid2 is {} ", uid1, uid2);
-        Optional<Friend_request> freq = friendReqRepo.findByUids(uid1, uid2);
+        Optional<Friend_request> freq = friendReqRepo.findByUid1AndUid2(uid1, uid2);
         log.warn(freq.toString());
         if (freq.isEmpty()) return false;
         int uidTemp1 = freq.get().getUid1();
@@ -193,7 +196,6 @@ public class FriendRequestService {
      *         - HTTP 400 (Bad Request) if the action is not permitted.
      */
     public ResponseEntity<String> deleteSendRequest(int receiverID, int senderId) {
-        // TODO: Check only the sender can delete the request
         if (validateFrAction(receiverID, senderId, false)) {
             if (receiverID > senderId) {
                 int temp = receiverID;
@@ -204,5 +206,20 @@ public class FriendRequestService {
             return deleteFriendRequest(receiverID, senderId);
         }
         return new ResponseEntity<>("Action not permitted.", HttpStatus.BAD_REQUEST);
+    }
+
+    // TODO: complete this method
+    private boolean validateReadingRequest(int uid){
+        return false;
+    }
+
+    // TODO: complete this
+    public ResponseEntity<List<FriendListDto>> getFriendList(int uid, Pageable pageable){
+       return null;
+    }
+
+    // TODO: complete this
+    public ResponseEntity<List<FriendReqPendingDto>> getPendingRequest(int uid){
+        return null;
     }
 }

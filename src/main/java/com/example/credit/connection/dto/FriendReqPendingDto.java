@@ -1,6 +1,6 @@
 package com.example.credit.connection.dto;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
-public record FriendReqPendingDto(int id , String name , String email, Date requestSent) {
+public record FriendReqPendingDto(int id , String name , String email, LocalDateTime requestSent) {
 }
