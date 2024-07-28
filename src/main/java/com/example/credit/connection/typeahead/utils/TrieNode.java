@@ -12,7 +12,10 @@ public class TrieNode {
     private TrieNode[] children;
     private String word;
 
-    /** Initialize {@link TrieNode} eow to false and node array to null */
+    /**
+     * Initializes a new TrieNode with the default settings.
+     * Sets the end-of-word flag to false and initializes the children array with null values.
+     */
     public TrieNode() {
         this.eow = false;
         this.children = new TrieNode[ALPHABET_SIZE];
@@ -21,12 +24,13 @@ public class TrieNode {
         }
     }
 
-    // TODO: Add spaces into the trie
     /**
-     * Insert word into trie
+     * Inserts a word into the Trie starting from the given root node.
+     * Converts the word to lowercase, then iterates through its characters to create or traverse nodes.
+     * Marks the end of the word in the Trie.
      *
-     * @param root pointer to current node
-     * @param word word need to be inserted
+     * @param root the root node of the Trie.
+     * @param word the word to be inserted into the Trie.
      */
     public void insert(TrieNode root, String word) {
         word = word.toLowerCase();
@@ -44,11 +48,13 @@ public class TrieNode {
     }
 
     /**
-     * Search for all words that starts with param
+     * Searches for words in the Trie that start with the given prefix.
+     * Converts the prefix to lowercase, then traverses the Trie to find the corresponding node.
+     * Collects all words that start with the given prefix.
      *
-     * @param root   Pointer to node
-     * @param prefix word to be searched
-     * @return List of 5 words that starts with prefix
+     * @param root the root node of the Trie.
+     * @param prefix the prefix to search for in the Trie.
+     * @return a list of words that start with the given prefix. If no words are found, returns an empty list.
      */
     public List<String> search(TrieNode root, String prefix) {
         prefix = prefix.toLowerCase();
@@ -67,10 +73,11 @@ public class TrieNode {
     }
 
     /**
-     * Helper function which through the trie
+     * Collects words from the Trie starting from the given node and adds them to the result list.
+     * The collection stops if the current node is null or if the result list already contains 5 words.
      *
-     * @param curNode Pointer to current node
-     * @param result  Array holding 5 string
+     * @param curNode the current node in the Trie from which to collect words.
+     * @param result the list where collected words are added.
      */
     private void collectWords(TrieNode curNode, List<String> result) {
         if (curNode == null || result.size() == 5) {

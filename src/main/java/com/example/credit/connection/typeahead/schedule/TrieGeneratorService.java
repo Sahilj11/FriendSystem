@@ -3,6 +3,7 @@ package com.example.credit.connection.typeahead.schedule;
 import com.example.credit.connection.typeahead.utils.TrieNode;
 import com.example.credit.entities.UserEntity;
 import com.example.credit.repo.UserRepo;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -12,6 +13,12 @@ import org.springframework.stereotype.Component;
 public class TrieGeneratorService {
 
     private final UserRepo userRepo;
+
+    /**
+     * -- GETTER --
+     *  Getter for root of trie
+     */
+    @Getter
     private TrieNode root;
 
     public TrieGeneratorService(UserRepo userRepo) {
@@ -20,9 +27,10 @@ public class TrieGeneratorService {
     }
 
     /**
-     * Schedule task, generate trie for typeahead feature
+     * Periodically generates and updates the Trie with user names from the repository.
+     * Scheduled to run at fixed intervals specified by the fixedDelay parameter.
      *
-     * @return refernce to the root of new generated trie
+     * @return the updated root node of the Trie.
      */
     //@Scheduled(cron = "0 0 0 * * SUN")
     @Scheduled(fixedDelay = 100000)
@@ -33,16 +41,6 @@ public class TrieGeneratorService {
             newRoot.insert(newRoot, entity.toLowerCase());
         }
         this.root = newRoot;
-        return root;
-    }
-
-    /**
-     * Getter for root of trie
-     *
-     * @return reference of root
-     */
-    public TrieNode getRoot() {
-        //root.printAll(root);
         return root;
     }
 }

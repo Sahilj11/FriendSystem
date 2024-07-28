@@ -25,6 +25,16 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final UserDetailsService userDetailsService;
 
+    /**
+     * Filters incoming HTTP requests to check for a valid JWT token in the Authorization header.
+     * If a valid token is found and not expired, extracts the email and sets the authentication in the security context.
+     *
+     * @param request the HTTP request to filter.
+     * @param response the HTTP response to filter.
+     * @param filterChain the filter chain to pass the request and response to the next filter.
+     * @throws ServletException if a servlet-specific error occurs during filtering.
+     * @throws IOException if an I/O error occurs during filtering.
+     */
     @Override
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

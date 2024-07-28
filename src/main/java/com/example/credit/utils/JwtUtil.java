@@ -18,8 +18,21 @@ public class JwtUtil {
 
     @SuppressWarnings("SpellCheckingInspection")
     private static final String jwtKey = "BBwEyUjed9tXB24+L+r4O3AHg4BLmqSYm9SAuAMST1Y=";
+
+    /**
+     * Validity of 20 days.
+     */
     private static final int validDate = 1728000000;
 
+    /**
+     * Generates a JWT token for the given username, email, and user ID.
+     * Adds the email and user ID as claims to the token.
+     *
+     * @param username the username for which the token is being generated.
+     * @param email the email address of the user.
+     * @param uId the unique ID of the user.
+     * @return a result of {@link JwtUtil#createToken(String, Map)} which generate JWT token.
+     */
     public static String generateToken(String username, String email, int uId) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", email);
@@ -27,6 +40,14 @@ public class JwtUtil {
         return createToken(username, claims);
     }
 
+    /**
+     * Creates a JWT token for the given username with the specified claims.
+     * Sets the issued date to the current time and the expiration date based on the validity period.
+     *
+     * @param username the username for which the token is being generated.
+     * @param claims a map containing additional claims to be added to the token.
+     * @return a JWT token containing the username and specified claims.
+     */
     private static String createToken(String username, Map<String, Object> claims) {
         return Jwts.builder()
                 .subject(username)
@@ -41,6 +62,11 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(jwtKey.getBytes());
     }
 
+    /**
+     * Validate if Authorization header contains JWT token.
+     * @param headerAuth value of authorization header.
+     * @return {@code true} if header is valid else {@code false} if not.
+     */
     public static boolean validHeader(String headerAuth) {
         if (headerAuth.startsWith("Bearer ") && headerAuth.length() > 7) return true;
         log.warn("Header provided {}", headerAuth);

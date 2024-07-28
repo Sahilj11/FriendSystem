@@ -182,6 +182,16 @@ public class FriendRequestService {
         }
     }
 
+    /**
+     * Deletes a friend request sent by the sender to the receiver.
+     * Validates that the action is permitted and ensures that only the sender can delete the request.
+     *
+     * @param receiverID the ID of the user who received the friend request.
+     * @param senderId the ID of the user who sent the friend request.
+     * @return a {@link ResponseEntity} containing a message indicating the result of the delete operation.
+     *         - HTTP 200 (OK) if the friend request is successfully deleted.
+     *         - HTTP 400 (Bad Request) if the action is not permitted.
+     */
     public ResponseEntity<String> deleteSendRequest(int receiverID, int senderId) {
         // TODO: Check only the sender can delete the request
         if (validateFrAction(receiverID, senderId, false)) {

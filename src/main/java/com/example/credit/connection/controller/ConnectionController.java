@@ -36,10 +36,12 @@ public class ConnectionController {
     // TODO: what will be the case if no search query is there
 
     /**
-     * Provide list of name like the query string use trie
+     * Searches for user suggestions based on a query string for a type-ahead feature.
+     * If the query string is empty or invalid, it returns an empty list.
      *
-     * @param q Query string
-     * @return List of names like q
+     * @param q the query string to search for user suggestions. It must not be empty or invalid according to {@link InputVal#queryInvalid(String)}.
+     * @return a {@link ResponseEntity} containing a list of {@link TypeAheadDto} objects with user suggestions,
+     * or an empty list if the query string is empty or invalid.
      */
     @GetMapping(path = "search/ta")
     public ResponseEntity<List<TypeAheadDto>> searchUser(@RequestParam String q) {
@@ -50,12 +52,14 @@ public class ConnectionController {
     }
 
     /**
-     * Endpoint to get list of users
+     * Searches for a list of users based on a query string, page number, and page size.
+     * If any of the parameters are invalid, it returns a {@link HttpStatus#BAD_REQUEST} response.
      *
-     * @param q    Query String
-     * @param page Page number
-     * @param size Size of each page
-     * @return {@link UserListDto} contains id name and email
+     * @param q    the query string to search for users. It must not be null or invalid according to {@link InputVal#queryInvalid(String)}.
+     * @param page the page number to retrieve. It must not be null and must be greater than or equal to 0.
+     * @param size the number of items per page. It must not be null and must be greater than 0.
+     * @return a {@link ResponseEntity} containing a list of {@link UserListDto} objects if the parameters are valid,
+     * or a {@link HttpStatus#BAD_REQUEST} response if any parameters are invalid.
      */
     @GetMapping(path = "search")
     public ResponseEntity<List<UserListDto>> searchUserList(@RequestParam String q, @RequestParam Integer page, @RequestParam Integer size) {
@@ -77,6 +81,14 @@ public class ConnectionController {
 
     // TODO: make profile url for each user
     // TODO: endpoint to set connection request must contain identifier for sender and receiver
+    /**
+     * Handles the creation of a new friend request.
+     * Extracts the user ID from the JWT token in the Authorization header and uses it as the sender of the friend request.
+     *
+     * @param friendReqDto the DTO containing the receiver's user ID for the friend request.
+     * @param request the HTTP request containing the Authorization header with the JWT token.
+     * @return a {@link ResponseEntity} containing a message indicating the result of the friend request operation.
+     */
     @PostMapping(path = "freq")
     public ResponseEntity<String> connectionReq(@RequestBody FriendReqDto friendReqDto, HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
@@ -85,6 +97,18 @@ public class ConnectionController {
         return friendRequestService.sendFriendReq(friendReqDto.receiverId(), uId);
     }
 
+    /**
+     * Handles actions on a friend request, such as accepting or denying the request.
+     * Extracts the user ID from the JWT token in the Authorization header and performs the specified action.
+     *
+     * @param userId the ID of the user who sent the friend request.
+     * @param action the action to be performed on the friend request (ACCEPT or DENY).
+     * @param request the HTTP request containing the Authorization header with the JWT token.
+     * @return a {@link ResponseEntity} containing a message indicating the result of the friend request action.
+     *         - HTTP 200 (OK) if the action is successfully performed.
+     *         - HTTP 400 (Bad Request) if the action is invalid or not allowed.
+     *         - HTTP 500 (Internal Server Error) if an error occurs while performing the action.
+     */
     @PatchMapping(path = "freq")
     public ResponseEntity<String> actOnRequest(@RequestParam int userId, @RequestParam FriendReqResponse action, HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
@@ -102,11 +126,22 @@ public class ConnectionController {
         };
     }
 
+    /**
+     * Handles the deletion of a friend request by the sender.
+     * Extracts the user ID from the JWT token in the Authorization header and deletes the friend request sent by the user.
+     *
+     * @param userId the ID of the user who is the receiver of the friend request.
+     * @param request the HTTP request containing the Authorization header with the JWT token.
+     * @return a {@link ResponseEntity} containing a message indicating the result of the delete operation.
+     *         - HTTP 200 (OK) if the friend request is successfully deleted.
+     *         - HTTP 400 (Bad Request) if the action is invalid or not allowed.
+     *         - HTTP 500 (Internal Server Error) if an error occurs while performing the deletion.
+     */
     @DeleteMapping(path = "freq")
-    public ResponseEntity<String> actOnRequestBySender(@RequestParam int userId,HttpServletRequest request){
+    public ResponseEntity<String> actOnRequestBySender(@RequestParam int userId, HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         String token = authHeader.substring(7).trim();
         int loggedId = JwtUtil.extractId(token);
-        return friendRequestService.deleteSendRequest(userId,loggedId);
+        return friendRequestService.deleteSendRequest(userId, loggedId);
     }
 }

@@ -30,6 +30,15 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
 
+    /**
+     * Authenticates a user using the provided login credentials.
+     * If authentication is successful, generates a JWT token for the user.
+     *
+     * @param loginDto the login data transfer object containing the user's email and password.
+     * @return a {@link ResponseEntity} containing the JWT token and HTTP status code.
+     *         - HTTP 200 OK with the JWT token if authentication is successful.
+     *         - HTTP 400 BAD REQUEST with an error message if authentication fails.
+     */
     public ResponseEntity<String> loginAuth(LoginDto loginDto) {
         try {
             authenticationManager.authenticate(
@@ -45,6 +54,16 @@ public class AuthService {
         }
     }
 
+    /**
+     * Registers a new user using the provided signup details.
+     * If the registration is successful, generates a JWT token for the new user.
+     *
+     * @param signupDto the signup data transfer object containing the user's name, email, and password.
+     * @return a {@link ResponseEntity} containing the JWT token and HTTP status code.
+     *         - HTTP 201 CREATED with the JWT token if registration is successful.
+     *         - HTTP 400 BAD REQUEST with an error message if the email is already in use or other validation issues occur.
+     *         - HTTP 500 INTERNAL SERVER ERROR with a generic error message if an unknown error occurs.
+     */
     public ResponseEntity<String> signupService(SignupDto signupDto) {
         UserEntity uEntity = new UserEntity();
         try {
@@ -63,8 +82,8 @@ public class AuthService {
             }
                 return new ResponseEntity<>("Some issue with values entered.", HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            log.warn("Error occured while creating new account {}", e.getMessage());
-            return new ResponseEntity<>("Something bad happended , Please try again.", HttpStatus.BAD_REQUEST);
+            log.warn("Error occurred while creating new account {}", e.getMessage());
+            return new ResponseEntity<>("Something bad happened , Please try again.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
