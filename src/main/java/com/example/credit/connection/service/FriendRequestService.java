@@ -7,6 +7,8 @@ import com.example.credit.repo.UserFriendRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,7 +30,7 @@ public class FriendRequestService {
      * @param uid1 logged user sending request.
      */
     // TODO: understand what is it doing.
-    public void sendFriendReq(int uid2, int uid1) {
+    public ResponseEntity<String> sendFriendReq(int uid2, int uid1) {
         try {
             log.warn("User with id {} sending request to User with id {}", uid1, uid2);
             Friend_request friend_request = new Friend_request();
@@ -36,7 +38,7 @@ public class FriendRequestService {
             if (uid1 < uid2) {
                 if (friendReqRepo.existsByUid1(uid1)) {
                     log.warn("User with id {} is already friends with User with id {}", uid1, uid2);
-                    return;
+                    return new ResponseEntity<>("You are already friends", HttpStatus.BAD_REQUEST);
                 }
                 friend_request.setUid1(uid1);
                 friend_request.setUid2(uid2);
@@ -44,15 +46,17 @@ public class FriendRequestService {
             } else {
                 if (friendReqRepo.existsByUid2(uid1)) {
                     log.warn("User with id {} is already friends with User with id {}", uid1, uid2);
-                    return;
+                    return new ResponseEntity<>("You are already friends", HttpStatus.BAD_REQUEST);
                 }
                 friend_request.setUid1(uid2);
                 friend_request.setUid2(uid1);
                 friend_request.setRequestor("UID2");
             }
             friendReqRepo.save(friend_request);
+            return new ResponseEntity<>("Friend request sent.", HttpStatus.OK);
         } catch (Exception e) {
             log.warn("Issue occurred while sending friend request from userId {} to userID {}. {}", uid1, uid2, e.getMessage());
+            return new ResponseEntity<>("Issue occurred while sending request try again.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -69,24 +73,35 @@ public class FriendRequestService {
      * @throws IllegalArgumentException if action is not valid.
      */
     @Transactional
-    public void acceptFriendReq(int uid1, int loggedId) {
-        if (validateFrAction(uid1, loggedId)) {
-            if (uid1 > loggedId) {
-                int temp = uid1;
-                uid1 = loggedId;
-                loggedId = temp;
+    public ResponseEntity<String> acceptFriendReq(int uid1, int loggedId) {
+        int loggedID = loggedId;
+        try {
+            if (validateFrAction(uid1, loggedId, true)) {
+                if (uid1 > loggedId) {
+                    int temp = uid1;
+                    uid1 = loggedId;
+                    loggedId = temp;
+                }
+                User_friend userFriend = new User_friend();
+                User_friend userFriendReverse = new User_friend();
+                userFriend.setUser_id(uid1);
+                userFriendReverse.setFriend_id(uid1);
+                userFriend.setFriend_id(loggedId);
+                userFriendReverse.setUser_id(loggedId);
+                userFriendRepo.saveAll(List.of(userFriend, userFriendReverse));
+                deleteFriendRequest(uid1, loggedId);
+                return new ResponseEntity<>("You are now friends", HttpStatus.OK);
+            } else {
+                throw new IllegalArgumentException("Argument not allowed");
             }
-            User_friend userFriend = new User_friend();
-            User_friend userFriendReverse = new User_friend();
-            userFriend.setUser_id(uid1);
-            userFriendReverse.setFriend_id(uid1);
-            userFriend.setFriend_id(loggedId);
-            userFriendReverse.setUser_id(loggedId);
-            userFriendRepo.saveAll(List.of(userFriend, userFriendReverse));
-            deleteFriendRequest(uid1, loggedId);
-        } else {
-            throw new IllegalArgumentException("Argument not allowed");
+        } catch (IllegalArgumentException ie) {
+            log.warn("user with id {} tried to perform illegal action. {}", loggedID, ie.getMessage());
+            return new ResponseEntity<>("Action not allowed", HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
     }
 
     /**
@@ -117,17 +132,17 @@ public class FriendRequestService {
      * @throws IllegalArgumentException if the logged-in user is not authorized to perform the rejection as specified
      *                                  by {@link com.example.credit.connection.dto.FriendReqResponse}
      */
-    @Transactional
-    public void rejectFriendReq(int uid1, int loggedId) {
-        if (validateFrAction(uid1, loggedId)) {
+    public ResponseEntity<String> rejectFriendReq(int uid1, int loggedId) {
+        if (validateFrAction(uid1, loggedId, true)) {
             if (uid1 > loggedId) {
                 int temp = uid1;
                 uid1 = loggedId;
                 loggedId = temp;
             }
             deleteFriendRequest(uid1, loggedId);
+            return new ResponseEntity<>("Friend request rejected.", HttpStatus.OK);
         } else {
-            throw new IllegalArgumentException("Argument not allowed");
+            return new ResponseEntity<>("Action not allowed.", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -142,7 +157,7 @@ public class FriendRequestService {
      * @return {@code true} if the action specified by {@link com.example.credit.connection.dto.FriendReqResponse}
      * is allowed; {@code false} otherwise
      */
-    private boolean validateFrAction(int uid1, int uid2) {
+    private boolean validateFrAction(int uid1, int uid2, boolean receiver) {
         int loggerID = uid2;
         if (uid1 > uid2) {
             int temp = uid1;
@@ -159,11 +174,25 @@ public class FriendRequestService {
         String requestor = freq.get().getRequestor();
         log.warn("Requestor is {} and logged in ID is {}", requestor, loggerID);
         if (uidTemp1 == loggerID) {
-            return requestor.equals("UID2");
+            return receiver ? requestor.equals("UID2") : requestor.equals("UID1");
         } else if (uidTemp2 != loggerID) {
             return false;
         } else {
-            return requestor.equals("UID1");
+            return receiver ? requestor.equals("UID1") : requestor.equals("UID2");
         }
+    }
+
+    public ResponseEntity<String> deleteSendRequest(int receiverID, int senderId) {
+        // TODO: Check only the sender can delete the request
+        if (validateFrAction(receiverID, senderId, false)) {
+            if (receiverID > senderId) {
+                int temp = receiverID;
+                receiverID = senderId;
+                senderId = temp;
+            }
+            deleteFriendRequest(receiverID, senderId);
+            return new ResponseEntity<>("Friend request  removed.", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Action not permitted.", HttpStatus.BAD_REQUEST);
     }
 }

@@ -78,29 +78,35 @@ public class ConnectionController {
     // TODO: make profile url for each user
     // TODO: endpoint to set connection request must contain identifier for sender and receiver
     @PostMapping(path = "freq")
-    public void connectionReq(@RequestBody FriendReqDto friendReqDto, HttpServletRequest request) {
+    public ResponseEntity<String> connectionReq(@RequestBody FriendReqDto friendReqDto, HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         String token = authHeader.substring(7).trim();
         int uId = JwtUtil.extractId(token);
-        friendRequestService.sendFriendReq(friendReqDto.receiverId(), uId);
+        return friendRequestService.sendFriendReq(friendReqDto.receiverId(), uId);
     }
 
-    @PutMapping(path = "freq")
-    public void actOnRequest(@RequestParam int userId, @RequestParam FriendReqResponse action, HttpServletRequest request) {
+    @PatchMapping(path = "freq")
+    public ResponseEntity<String> actOnRequest(@RequestParam int userId, @RequestParam FriendReqResponse action, HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         String token = authHeader.substring(7).trim();
         int loggedId = JwtUtil.extractId(token);
-        switch (action) {
-            case ACCEPT:
+        return switch (action) {
+            case ACCEPT -> {
                 log.warn("Request accepted of {}", userId);
-                friendRequestService.acceptFriendReq(userId, loggedId);
-                break;
-            case DENY:
+                yield friendRequestService.acceptFriendReq(userId, loggedId);
+            }
+            case DENY -> {
                 log.warn("Request denied of {}", userId);
-                friendRequestService.rejectFriendReq(userId,loggedId);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid action: " + action);
-        }
+                yield friendRequestService.rejectFriendReq(userId, loggedId);
+            }
+        };
+    }
+
+    @DeleteMapping(path = "freq")
+    public ResponseEntity<String> actOnRequestBySender(@RequestParam int userId,HttpServletRequest request){
+        String authHeader = request.getHeader("Authorization");
+        String token = authHeader.substring(7).trim();
+        int loggedId = JwtUtil.extractId(token);
+        return friendRequestService.deleteSendRequest(userId,loggedId);
     }
 }
