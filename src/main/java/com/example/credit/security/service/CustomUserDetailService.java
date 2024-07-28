@@ -1,17 +1,15 @@
 package com.example.credit.security.service;
 
-import java.util.Optional;
-
+import com.example.credit.entities.UserEntity;
+import com.example.credit.repo.UserRepo;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.example.credit.entities.UserEntity;
-import com.example.credit.repo.UserRepo;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Optional;
 
 /** CustomUserDetailService */
 @Service

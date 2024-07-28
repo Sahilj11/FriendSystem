@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "user_friend")
 @Getter
@@ -15,4 +17,16 @@ public class User_friend {
     private int id;
     private int user_id;
     private int friend_id;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime created_date;
+
+    @PrePersist
+    private void onCreate(){
+        created_date = LocalDateTime.now();
+    }
+    @PreUpdate
+    private void onUpdate(){
+        created_date = LocalDateTime.now();
+    }
 }

@@ -112,13 +112,14 @@ public class FriendRequestService {
      * @param loggedId the user ID of the logged-in user
      * @throws RuntimeException if an error occurs while interacting with the database
      */
-    private void deleteFriendRequest(int uid1, int loggedId) {
+    private ResponseEntity<String> deleteFriendRequest(int uid1, int loggedId) {
         try {
             friendReqRepo.deleteByUserIds(uid1, loggedId);
             log.warn("Friend Request of {} and {} is removed", uid1, loggedId);
+            return new ResponseEntity<>("Friend Request Successfully Deleted",HttpStatus.OK);
         } catch (Exception e) {
-            log.warn("Error while deleting {} and {} friend_request.\n{}", uid1, loggedId, e.getMessage());
-            throw new RuntimeException(e);
+            log.warn("Error while deleting {} and {} friend_request.\n{}", uid1, loggedId, e.toString());
+            return new ResponseEntity<>("Error occurred while deleting friend request",HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -139,8 +140,7 @@ public class FriendRequestService {
                 uid1 = loggedId;
                 loggedId = temp;
             }
-            deleteFriendRequest(uid1, loggedId);
-            return new ResponseEntity<>("Friend request rejected.", HttpStatus.OK);
+            return deleteFriendRequest(uid1, loggedId);
         } else {
             return new ResponseEntity<>("Action not allowed.", HttpStatus.BAD_REQUEST);
         }
@@ -200,8 +200,8 @@ public class FriendRequestService {
                 receiverID = senderId;
                 senderId = temp;
             }
-            deleteFriendRequest(receiverID, senderId);
-            return new ResponseEntity<>("Friend request  removed.", HttpStatus.OK);
+            log.warn("uid1 is {} and uid2 is {}.",receiverID,senderId);
+            return deleteFriendRequest(receiverID, senderId);
         }
         return new ResponseEntity<>("Action not permitted.", HttpStatus.BAD_REQUEST);
     }
