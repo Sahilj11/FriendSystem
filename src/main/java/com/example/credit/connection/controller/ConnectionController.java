@@ -1,9 +1,6 @@
 package com.example.credit.connection.controller;
 
-import com.example.credit.connection.dto.FriendReqDto;
-import com.example.credit.connection.dto.FriendReqResponse;
-import com.example.credit.connection.dto.TypeAheadDto;
-import com.example.credit.connection.dto.UserListDto;
+import com.example.credit.connection.dto.*;
 import com.example.credit.connection.service.ConnectionService;
 import com.example.credit.connection.service.FriendRequestService;
 import com.example.credit.utils.JwtUtil;
@@ -11,6 +8,7 @@ import com.example.credit.utils.inputvalidation.InputVal;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -81,19 +79,18 @@ public class ConnectionController {
 
     // TODO: make profile url for each user
     // TODO: endpoint to set connection request must contain identifier for sender and receiver
+
     /**
      * Handles the creation of a new friend request.
      * Extracts the user ID from the JWT token in the Authorization header and uses it as the sender of the friend request.
      *
      * @param friendReqDto the DTO containing the receiver's user ID for the friend request.
-     * @param request the HTTP request containing the Authorization header with the JWT token.
+     * @param request      the HTTP request containing the Authorization header with the JWT token.
      * @return a {@link ResponseEntity} containing a message indicating the result of the friend request operation.
      */
     @PostMapping(path = "freq")
     public ResponseEntity<String> connectionReq(@RequestBody FriendReqDto friendReqDto, HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        String token = authHeader.substring(7).trim();
-        int uId = JwtUtil.extractId(token);
+        int uId = JwtUtil.extractId(request);
         return friendRequestService.sendFriendReq(friendReqDto.receiverId(), uId);
     }
 
@@ -101,19 +98,17 @@ public class ConnectionController {
      * Handles actions on a friend request, such as accepting or denying the request.
      * Extracts the user ID from the JWT token in the Authorization header and performs the specified action.
      *
-     * @param userId the ID of the user who sent the friend request.
-     * @param action the action to be performed on the friend request (ACCEPT or DENY).
+     * @param userId  the ID of the user who sent the friend request.
+     * @param action  the action to be performed on the friend request (ACCEPT or DENY).
      * @param request the HTTP request containing the Authorization header with the JWT token.
      * @return a {@link ResponseEntity} containing a message indicating the result of the friend request action.
-     *         - HTTP 200 (OK) if the action is successfully performed.
-     *         - HTTP 400 (Bad Request) if the action is invalid or not allowed.
-     *         - HTTP 500 (Internal Server Error) if an error occurs while performing the action.
+     * - HTTP 200 (OK) if the action is successfully performed.
+     * - HTTP 400 (Bad Request) if the action is invalid or not allowed.
+     * - HTTP 500 (Internal Server Error) if an error occurs while performing the action.
      */
     @PatchMapping(path = "freq")
     public ResponseEntity<String> actOnRequest(@RequestParam int userId, @RequestParam FriendReqResponse action, HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        String token = authHeader.substring(7).trim();
-        int loggedId = JwtUtil.extractId(token);
+        int loggedId = JwtUtil.extractId(request);
         return switch (action) {
             case ACCEPT -> {
                 log.warn("Request accepted of {}", userId);
@@ -130,18 +125,22 @@ public class ConnectionController {
      * Handles the deletion of a friend request by the sender.
      * Extracts the user ID from the JWT token in the Authorization header and deletes the friend request sent by the user.
      *
-     * @param userId the ID of the user who is the receiver of the friend request.
+     * @param userId  the ID of the user who is the receiver of the friend request.
      * @param request the HTTP request containing the Authorization header with the JWT token.
      * @return a {@link ResponseEntity} containing a message indicating the result of the delete operation.
-     *         - HTTP 200 (OK) if the friend request is successfully deleted.
-     *         - HTTP 400 (Bad Request) if the action is invalid or not allowed.
-     *         - HTTP 500 (Internal Server Error) if an error occurs while performing the deletion.
+     * - HTTP 200 (OK) if the friend request is successfully deleted.
+     * - HTTP 400 (Bad Request) if the action is invalid or not allowed.
+     * - HTTP 500 (Internal Server Error) if an error occurs while performing the deletion.
      */
     @DeleteMapping(path = "freq")
     public ResponseEntity<String> actOnRequestBySender(@RequestParam int userId, HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        String token = authHeader.substring(7).trim();
-        int loggedId = JwtUtil.extractId(token);
+        int loggedId = JwtUtil.extractId(request);
         return friendRequestService.deleteSendRequest(userId, loggedId);
+    }
+
+    @GetMapping(path = "freq")
+    public ResponseEntity<Page<FriendReqPendingDto>> getPendingRequest(@RequestParam boolean sent,Pageable pageable, HttpServletRequest request) {
+        int loggedId = JwtUtil.extractId(request);
+        return friendRequestService.getPendingRequest(sent,loggedId, pageable);
     }
 }

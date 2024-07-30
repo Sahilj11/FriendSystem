@@ -3,12 +3,15 @@ package com.example.credit.connection.service;
 import com.example.credit.connection.dto.FriendListDto;
 import com.example.credit.connection.dto.FriendReqPendingDto;
 import com.example.credit.entities.Friend_request;
+import com.example.credit.entities.UserEntity;
 import com.example.credit.entities.User_friend;
 import com.example.credit.repo.FriendReqRepo;
 import com.example.credit.repo.UserFriendRepo;
+import com.example.credit.repo.UserRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +27,7 @@ public class FriendRequestService {
 
     private final UserFriendRepo userFriendRepo;
     private final FriendReqRepo friendReqRepo;
+    private final UserRepo userRepo;
 
     /**
      * Sending friend request using two ids.
@@ -35,21 +39,21 @@ public class FriendRequestService {
     // TODO: understand what is it doing.
     public ResponseEntity<String> sendFriendReq(int uid2, int uid1) {
         try {
-            log.warn("User with id {} sending request to User with id {}", uid1, uid2);
+            // log.warn("User with id {} sending request to User with id {}", uid1, uid2);
             Friend_request friend_request = new Friend_request();
             friend_request.setRequestor("UID1");
             if (uid1 < uid2) {
                 if (friendReqRepo.existsByUid1(uid1)) {
-                    log.warn("User with id {} is already friends with User with id {}", uid1, uid2);
-                    return new ResponseEntity<>("You are already friends", HttpStatus.BAD_REQUEST);
+                    log.warn("User with id {} already sent request to User with id {}", uid1, uid2);
+                    return new ResponseEntity<>("You have already sent request", HttpStatus.BAD_REQUEST);
                 }
                 friend_request.setUid1(uid1);
                 friend_request.setUid2(uid2);
                 friend_request.setRequestor("UID1");
             } else {
                 if (friendReqRepo.existsByUid2(uid1)) {
-                    log.warn("User with id {} is already friends with User with id {}", uid1, uid2);
-                    return new ResponseEntity<>("You are already friends", HttpStatus.BAD_REQUEST);
+                    log.warn("User with id {} already sent request to User with id {}", uid1, uid2);
+                    return new ResponseEntity<>("You have already sent request", HttpStatus.BAD_REQUEST);
                 }
                 friend_request.setUid1(uid2);
                 friend_request.setUid2(uid1);
@@ -218,8 +222,44 @@ public class FriendRequestService {
        return null;
     }
 
-    // TODO: complete this
-    public ResponseEntity<List<FriendReqPendingDto>> getPendingRequest(int uid){
-        return null;
+    /**
+     * Handles requests to retrieve pending friend requests.
+     *
+     * @param sent     a boolean flag indicating whether to fetch sent or received friend requests. If true, fetch sent requests; otherwise, fetch received requests.
+     * @param uid      the user ID of the user whose friend requests are being queried.
+     * @param pageable the pagination information.
+     * @return a {@link ResponseEntity} containing a {@link Page} of {@link FriendReqPendingDto} objects representing the pending friend requests.
+     * @throws IllegalStateException if the friend request data is invalid.
+     * @throws IllegalArgumentException if the user associated with the friend request cannot be found.
+     */
+    public ResponseEntity<Page<FriendReqPendingDto>> getPendingRequest(boolean sent , int uid,Pageable pageable){
+        if (sent){
+            Page<FriendReqPendingDto> fRequestSent = friendReqRepo.findAllByUidAndSentRequestor(uid,pageable).map(friendRequest -> {
+                int otherUid;
+                if (friendRequest.getRequestor().equals("UID1") && friendRequest.getUid1() == uid) {
+                    otherUid = friendRequest.getUid2();
+                } else if (friendRequest.getRequestor().equals("UID2") && friendRequest.getUid2() == uid) {
+                    otherUid = friendRequest.getUid1();
+                } else {
+                    throw new IllegalStateException("Invalid friend request data");
+                }
+                UserEntity user = userRepo.findByUserId(otherUid).orElseThrow(()->new IllegalArgumentException("User not found"));
+                return new FriendReqPendingDto(friendRequest.getId(),user.getName(),user.getEmail(),friendRequest.getCreated_date());
+            });
+            return new ResponseEntity<>(fRequestSent,HttpStatus.OK);
+        }
+        Page<FriendReqPendingDto> fRequestReceived = friendReqRepo.findAllByUidAndRequestor(uid,pageable).map(friendRequest -> {
+            int otherUid;
+            if (friendRequest.getRequestor().equals("UID2") && friendRequest.getUid1() == uid) {
+                otherUid = friendRequest.getUid2();
+            } else if (friendRequest.getRequestor().equals("UID1") && friendRequest.getUid2() == uid) {
+                otherUid = friendRequest.getUid1();
+            } else {
+                throw new IllegalStateException("Invalid friend request data");
+            }
+            UserEntity user = userRepo.findByUserId(otherUid).orElseThrow(()->new IllegalArgumentException("User not found"));
+            return new FriendReqPendingDto(friendRequest.getId(),user.getName(),user.getEmail(),friendRequest.getCreated_date());
+        });
+        return new ResponseEntity<>(fRequestReceived,HttpStatus.OK);
     }
 }

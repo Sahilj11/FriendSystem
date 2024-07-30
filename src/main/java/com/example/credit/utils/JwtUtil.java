@@ -3,6 +3,7 @@ package com.example.credit.utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.crypto.SecretKey;
@@ -97,5 +98,10 @@ public class JwtUtil {
 
     public static boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
+    }
+    public static int extractId(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        String token = authHeader.substring(7).trim();
+        return extractId(token);
     }
 }

@@ -1,13 +1,13 @@
 package com.example.credit.repo;
 
 import com.example.credit.entities.UserEntity;
-import java.util.Optional;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
 import java.util.List;
+import java.util.Optional;
 /**
  * UserRepo
  *
@@ -22,4 +22,6 @@ public interface UserRepo extends JpaRepository<UserEntity, Integer> {
 
     @Query("SELECT p FROM UserEntity p WHERE p.name LIKE :name%")
     List<UserEntity> findByNameLike(@Param("name") String name,Pageable pageable);
+
+    Optional<UserEntity> findByUserId(int uid);
 }
