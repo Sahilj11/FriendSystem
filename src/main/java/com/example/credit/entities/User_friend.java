@@ -15,7 +15,8 @@ public class User_friend {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private int user_id;
+    @Column(name = "user_id")
+    private int userId;
     private int friend_id;
 
     @Temporal(TemporalType.TIMESTAMP)

@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserFriendRepo extends JpaRepository<User_friend, Integer> {
 
-    Page<User_friend> findByUserId(int uid, Pageable pageable);
+    Page<User_friend> findByUserId(int userId, Pageable pageable);
 }

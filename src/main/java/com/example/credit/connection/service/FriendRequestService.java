@@ -87,10 +87,10 @@ public class FriendRequestService {
                 }
                 User_friend userFriend = new User_friend();
                 User_friend userFriendReverse = new User_friend();
-                userFriend.setUser_id(uid1);
+                userFriend.setUserId(uid1);
                 userFriendReverse.setFriend_id(uid1);
                 userFriend.setFriend_id(loggedId);
-                userFriendReverse.setUser_id(loggedId);
+                userFriendReverse.setUserId(loggedId);
                 userFriendRepo.saveAll(List.of(userFriend, userFriendReverse));
                 deleteFriendRequest(uid1, loggedId);
                 return new ResponseEntity<>("You are now friends", HttpStatus.OK);
