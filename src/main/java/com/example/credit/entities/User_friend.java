@@ -17,6 +17,7 @@ public class User_friend {
     private int id;
     @Column(name = "user_id")
     private int userId;
+
     private int friend_id;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -26,6 +27,7 @@ public class User_friend {
     private void onCreate(){
         created_date = LocalDateTime.now();
     }
+
     @PreUpdate
     private void onUpdate(){
         created_date = LocalDateTime.now();
