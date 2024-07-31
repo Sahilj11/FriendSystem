@@ -139,14 +139,14 @@ public class ConnectionController {
     }
 
     @GetMapping(path = "freq")
-    public ResponseEntity<Page<FriendReqPendingDto>> getPendingRequest(@RequestParam boolean sent,Pageable pageable, HttpServletRequest request) {
+    ResponseEntity<Page<FriendReqPendingDto>> getPendingRequest(@RequestParam boolean sent, Pageable pageable, HttpServletRequest request) {
         int loggedId = JwtUtil.extractId(request);
-        return friendRequestService.getPendingRequest(sent,loggedId, pageable);
+        return friendRequestService.getPendingRequest(sent, loggedId, pageable);
     }
 
     @GetMapping(path = "flist")
-    public ResponseEntity<Page<FriendListDto>> getFriendList(Pageable pageable,HttpServletRequest request){
+    public ResponseEntity<Page<FriendListDto>> getFriendList(Pageable pageable, HttpServletRequest request) {
         int loggedId = JwtUtil.extractId(request);
-        return friendRequestService.getFriendList(loggedId,pageable);
+        return friendRequestService.getFriendList(loggedId, pageable);
     }
 }
