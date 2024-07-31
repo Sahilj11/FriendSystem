@@ -77,9 +77,6 @@ public class ConnectionController {
         }
     }
 
-    // TODO: make profile url for each user
-    // TODO: endpoint to set connection request must contain identifier for sender and receiver
-
     /**
      * Handles the creation of a new friend request.
      * Extracts the user ID from the JWT token in the Authorization header and uses it as the sender of the friend request.

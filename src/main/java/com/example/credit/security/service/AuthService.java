@@ -86,18 +86,4 @@ public class AuthService {
             return new ResponseEntity<>("Something bad happened , Please try again.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        return getClass() == obj.getClass();
-    }
 }
