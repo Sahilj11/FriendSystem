@@ -143,4 +143,10 @@ public class ConnectionController {
         int loggedId = JwtUtil.extractId(request);
         return friendRequestService.getPendingRequest(sent,loggedId, pageable);
     }
+
+    @GetMapping(path = "flist")
+    public ResponseEntity<Page<FriendListDto>> getFriendList(Pageable pageable,HttpServletRequest request){
+        int loggedId = JwtUtil.extractId(request);
+        return friendRequestService.getFriendList(loggedId,pageable);
+    }
 }

@@ -123,10 +123,10 @@ public class FriendRequestService {
         try {
             friendReqRepo.deleteByUserIds(uid1, loggedId);
             log.warn("Friend Request of {} and {} is removed", uid1, loggedId);
-            return new ResponseEntity<>("Friend Request Successfully Deleted",HttpStatus.OK);
+            return new ResponseEntity<>("Friend Request Successfully Deleted", HttpStatus.OK);
         } catch (Exception e) {
             log.warn("Error while deleting {} and {} friend_request.\n{}", uid1, loggedId, e.toString());
-            return new ResponseEntity<>("Error occurred while deleting friend request",HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Error occurred while deleting friend request", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -194,10 +194,10 @@ public class FriendRequestService {
      * Validates that the action is permitted and ensures that only the sender can delete the request.
      *
      * @param receiverID the ID of the user who received the friend request.
-     * @param senderId the ID of the user who sent the friend request.
+     * @param senderId   the ID of the user who sent the friend request.
      * @return a {@link ResponseEntity} containing a message indicating the result of the delete operation.
-     *         - HTTP 200 (OK) if the friend request is successfully deleted.
-     *         - HTTP 400 (Bad Request) if the action is not permitted.
+     * - HTTP 200 (OK) if the friend request is successfully deleted.
+     * - HTTP 400 (Bad Request) if the action is not permitted.
      */
     public ResponseEntity<String> deleteSendRequest(int receiverID, int senderId) {
         if (validateFrAction(receiverID, senderId, false)) {
@@ -206,20 +206,19 @@ public class FriendRequestService {
                 receiverID = senderId;
                 senderId = temp;
             }
-            log.warn("uid1 is {} and uid2 is {}.",receiverID,senderId);
+            log.warn("uid1 is {} and uid2 is {}.", receiverID, senderId);
             return deleteFriendRequest(receiverID, senderId);
         }
         return new ResponseEntity<>("Action not permitted.", HttpStatus.BAD_REQUEST);
     }
 
-    // TODO: complete this method
-    private boolean validateReadingRequest(int uid){
-        return false;
-    }
-
     // TODO: complete this
-    public ResponseEntity<List<FriendListDto>> getFriendList(int uid, Pageable pageable){
-       return null;
+    public ResponseEntity<Page<FriendListDto>> getFriendList(int uid, Pageable pageable) {
+        Page<FriendListDto> friendList = userFriendRepo.findAllByUserId(uid, pageable).map(friend -> {
+            UserEntity friendUser = userRepo.findByUserId(friend.getFriend_id()).orElseThrow(() -> new IllegalArgumentException("User not found"));
+            return new FriendListDto(friend.getId(), friendUser.getName(), friendUser.getEmail(), friend.getCreated_date());
+        });
+        return new ResponseEntity<>(friendList, HttpStatus.OK);
     }
 
     /**
@@ -229,12 +228,12 @@ public class FriendRequestService {
      * @param uid      the user ID of the user whose friend requests are being queried.
      * @param pageable the pagination information.
      * @return a {@link ResponseEntity} containing a {@link Page} of {@link FriendReqPendingDto} objects representing the pending friend requests.
-     * @throws IllegalStateException if the friend request data is invalid.
+     * @throws IllegalStateException    if the friend request data is invalid.
      * @throws IllegalArgumentException if the user associated with the friend request cannot be found.
      */
-    public ResponseEntity<Page<FriendReqPendingDto>> getPendingRequest(boolean sent , int uid,Pageable pageable){
-        if (sent){
-            Page<FriendReqPendingDto> fRequestSent = friendReqRepo.findAllByUidAndSentRequestor(uid,pageable).map(friendRequest -> {
+    public ResponseEntity<Page<FriendReqPendingDto>> getPendingRequest(boolean sent, int uid, Pageable pageable) {
+        if (sent) {
+            Page<FriendReqPendingDto> fRequestSent = friendReqRepo.findAllByUidAndSentRequestor(uid, pageable).map(friendRequest -> {
                 int otherUid;
                 if (friendRequest.getRequestor().equals("UID1") && friendRequest.getUid1() == uid) {
                     otherUid = friendRequest.getUid2();
@@ -243,12 +242,12 @@ public class FriendRequestService {
                 } else {
                     throw new IllegalStateException("Invalid friend request data");
                 }
-                UserEntity user = userRepo.findByUserId(otherUid).orElseThrow(()->new IllegalArgumentException("User not found"));
-                return new FriendReqPendingDto(friendRequest.getId(),user.getName(),user.getEmail(),friendRequest.getCreated_date());
+                UserEntity user = userRepo.findByUserId(otherUid).orElseThrow(() -> new IllegalArgumentException("User not found"));
+                return new FriendReqPendingDto(friendRequest.getId(), user.getName(), user.getEmail(), friendRequest.getCreated_date());
             });
-            return new ResponseEntity<>(fRequestSent,HttpStatus.OK);
+            return new ResponseEntity<>(fRequestSent, HttpStatus.OK);
         }
-        Page<FriendReqPendingDto> fRequestReceived = friendReqRepo.findAllByUidAndRequestor(uid,pageable).map(friendRequest -> {
+        Page<FriendReqPendingDto> fRequestReceived = friendReqRepo.findAllByUidAndRequestor(uid, pageable).map(friendRequest -> {
             int otherUid;
             if (friendRequest.getRequestor().equals("UID2") && friendRequest.getUid1() == uid) {
                 otherUid = friendRequest.getUid2();
@@ -257,9 +256,9 @@ public class FriendRequestService {
             } else {
                 throw new IllegalStateException("Invalid friend request data");
             }
-            UserEntity user = userRepo.findByUserId(otherUid).orElseThrow(()->new IllegalArgumentException("User not found"));
-            return new FriendReqPendingDto(friendRequest.getId(),user.getName(),user.getEmail(),friendRequest.getCreated_date());
+            UserEntity user = userRepo.findByUserId(otherUid).orElseThrow(() -> new IllegalArgumentException("User not found"));
+            return new FriendReqPendingDto(friendRequest.getId(), user.getName(), user.getEmail(), friendRequest.getCreated_date());
         });
-        return new ResponseEntity<>(fRequestReceived,HttpStatus.OK);
+        return new ResponseEntity<>(fRequestReceived, HttpStatus.OK);
     }
 }

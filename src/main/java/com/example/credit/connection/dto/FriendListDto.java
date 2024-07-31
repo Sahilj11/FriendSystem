@@ -1,4 +1,6 @@
 package com.example.credit.connection.dto;
 
-public record FriendListDto(int uid , String name , String email) {
+import java.time.LocalDateTime;
+
+public record FriendListDto(int uid , String name , String email, LocalDateTime created_date) {
 }
