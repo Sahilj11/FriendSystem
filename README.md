@@ -9,8 +9,6 @@ This Spring Boot project implements a comprehensive friend system API that inclu
 - [Project Structure](#project-structure)
 - [API Endpoints](#api-endpoints)
 - [Database Design](#database-design)
-- [JWT Authentication](#jwt-authentication)
-- [Autocomplete Feature](#autocomplete-feature)
 - [Technologies Used](#technologies-used)
 - [Contributing](#contributing)
 - [License](#license)
@@ -184,3 +182,30 @@ Friendships: Similar to friend requests, each friendship involves two users (use
 
 ### Summary:
 This ER diagram models a basic social system where users can send and accept friend requests, forming friendships. Users have roles that dictate their permissions or abilities within the system.
+
+## Technologies Used
+
+This project leverages several technologies and libraries to deliver a robust and scalable application:
+
+- **Spring Boot**: A powerful, convention-over-configuration framework that simplifies the development of Java applications. Spring Boot provides various features such as embedded servers, simplified dependency management, and production-ready tools, making it the ideal choice for building RESTful APIs and microservices.
+
+- **Spring Data JPA**: A part of the larger Spring Data ecosystem, Spring Data JPA provides easy integration with JPA (Java Persistence API) and ORM (Object-Relational Mapping) technologies like Hibernate. It abstracts much of the boilerplate code required to interact with relational databases, offering features such as repository support, custom query methods, and transaction management.
+
+- **JJWT (Java JWT)**: A comprehensive Java library for creating and verifying JSON Web Tokens (JWT). JJWT is easy to use, robust, and follows the JWT specification closely, making it an excellent choice for implementing token-based authentication and authorization in your Spring Boot applications.
+
+### Other Dependencies
+
+- **MySQL**: A popular relational database used to store application data. Spring Data JPA is used to interact with MySQL.
+- **Maven**: A build automation tool used for managing dependencies, compiling, and packaging the project.
+- **JUnit & Mockito**: Libraries used for unit testing the application to ensure code quality and reliability.
+- **Lombok**: A Java library that helps reduce boilerplate code by generating getter, setter, equals, hashCode, and toString methods automatically.
+
+### Additional Libraries
+
+- **Spring Security**: Provides authentication, authorization, and other security features for the application, including integration with JJWT for token-based authentication.
+
+These technologies work together to create a scalable, secure, and maintainable application. Each of them plays a crucial role in ensuring that the system is both robust and easy to extend.
+
+## License
+
+This project is licensed under the MIT License
