@@ -36,4 +36,5 @@ node_modules
 
 /src/main/resources/application.properties
 
+# remove todos
 todo.md
