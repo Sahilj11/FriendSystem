@@ -8,6 +8,7 @@ This Spring Boot project implements a comprehensive friend system API that inclu
 - [Getting Started](#getting-started)
 - [Project Structure](#project-structure)
 - [API Endpoints](#api-endpoints)
+- [AutoComplete](#autocomplete)
 - [Database Design](#database-design)
 - [Technologies Used](#technologies-used)
 - [Contributing](#contributing)
@@ -140,6 +141,24 @@ Return list of friend request sent by the logged user
 http://localhost:8080/api/flist?page=0&size=10
 
 Return list of friend of logged user
+
+## AutoComplete
+
+This project includes an autocomplete feature implemented using a Trie data structure. A scheduler is also employed to periodically regenerate the Trie to ensure that the autocomplete suggestions remain up-to-date.
+
+### Trie Data Structure
+
+The Trie (pronounced as "try") is a tree-like data structure used to efficiently store and search a dynamic set of strings. It is particularly useful for autocomplete functionality because it allows for fast prefix-based lookups.
+
+#### Key Features:
+
+- **Insertion**: Adds words to the Trie, ensuring that common prefixes are stored only once.
+- **Search**: Quickly finds all words that start with a given prefix.
+- **Prefix Matching**: Efficiently retrieves suggestions based on the user's input prefix.
+
+### Scheduler for Trie Regeneration
+
+To ensure that the autocomplete suggestions reflect the most recent data, a scheduler is employed to periodically regenerate the Trie. This approach helps in maintaining performance and relevance, especially when the dataset is frequently updated.
 
 ## Database Design 
 ![ER Diagram](./friendSystemER.png)
