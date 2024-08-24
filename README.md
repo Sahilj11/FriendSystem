@@ -144,7 +144,7 @@ http://localhost:8080/api/flist?page=0&size=10
 Return list of friend of logged user
 
 ## Database Design 
-![ER Diagram](https://github.com/Sahilj11/FriendSystem/blob/Connection/friendSystem.png)
+![ER Diagram](./friendSystemER.png)
 
 This ER diagram represents a system for managing user relationships, such as friendships and friend requests, with an additional layer of role-based user management. Here is a description of the entities and their relationships:
 
