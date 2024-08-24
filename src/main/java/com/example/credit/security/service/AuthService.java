@@ -8,6 +8,9 @@ import com.example.credit.security.domain.SignupDto;
 import com.example.credit.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.UUID;
+
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -67,10 +70,12 @@ public class AuthService {
     public ResponseEntity<String> signupService(SignupDto signupDto) {
         UserEntity uEntity = new UserEntity();
         try {
+            UUID uuid = UUID.randomUUID();
             uEntity.setName(signupDto.name());
             uEntity.setEmail(signupDto.email());
             uEntity.setPassword(passwordEncoder.encode(signupDto.password()));
             uEntity.setRole(roleRepo.findByRoleName("FREE"));
+            uEntity.setUuid(uuid.toString());
             userRepo.save(uEntity);
             int uId = uEntity.getUserId();
             String jwtToken = JwtUtil.generateToken(signupDto.name(), signupDto.email(),uId);

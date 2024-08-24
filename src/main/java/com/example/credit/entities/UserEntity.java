@@ -35,6 +35,8 @@ public class UserEntity {
 
   private String password;
 
+  private String uuid;
+
   @Temporal(TemporalType.TIMESTAMP)
   private LocalDateTime created_date;
 
