@@ -1,4 +1,4 @@
-i# Friend System API with Autocomplete and JWT Authentication
+# Friend System API with Autocomplete and JWT Authentication
 
 This Spring Boot project implements a comprehensive friend system API that includes features like friend requests, managing friendships, and user authentication with JWT. Additionally, it offers an autocomplete feature using the Trie data structure.
 
@@ -149,30 +149,38 @@ Return list of friend of logged user
 This ER diagram represents a system for managing user relationships, such as friendships and friend requests, with an additional layer of role-based user management. Here is a description of the entities and their relationships:
 
 1. Users Table
-user\_id: The primary key for the users table. This uniquely identifies each user in the system.
-name: The name of the user.
-roleid: A foreign key linking to the roles table, specifying the user's role in the system.
-email: The email address of the user, likely used for login and communication purposes.
-password: The password for the user, stored securely.
-created\_date: The date and time when the user account was created.
-uuid: A universally unique identifier for the user, often used for public-facing identification.
+    user\_id: The primary key for the users table. This uniquely identifies each user in the system.
+    name: The name of the user.
+    roleid: A foreign key linking to the roles table, specifying the user's role in the system.
+    email: The email address of the user, likely used for login and communication purposes.
+    password: The password for the user, stored securely.
+    created\_date: The date and time when the user account was created.
+    uuid: A universally unique identifier for the user, often used for public-facing identification.
+
 2. Roles Table
-role\_id: The primary key for the roles table. This uniquely identifies each role.
-rolename: The name of the role, such as 'admin', 'user', etc.
+    role\_id: The primary key for the roles table. This uniquely identifies each role.
+    rolename: The name of the role, such as 'admin', 'user', etc.
+
 3. Friend Request Table (friend\_request)
-id: The primary key for the friend\_request table. This uniquely identifies each friend request.
-uid1: A foreign key referencing the user_id in the users table, representing the first user involved in the friend request.
-uid2: A foreign key referencing the user_id in the users table, representing the second user involved in the friend request.
-requestor: Identifies which user initiated the friend request.
-created_date: The date and time when the friend request was created.
-4. User Friend Table (user_friend)
-id: The primary key for the user_friend table. This uniquely identifies each friendship.
-user_id: A foreign key referencing the user_id in the users table, representing one of the users in the friendship.
-friend_id: A foreign key referencing the user_id in the users table, representing the other user in the friendship.
-created_date: The date and time when the friendship was established.
-Relationships
+    id: The primary key for the friend\_request table. This uniquely identifies each friend request.
+    uid1: A foreign key referencing the user_id in the users table, representing the first user involved in the friend request.
+    uid2: A foreign key referencing the user_id in the users table, representing the second user involved in the friend request.
+    requestor: Identifies which user initiated the friend request.
+    created_date: The date and time when the friend request was created.
+
+4. User Friend Table (user_friend) // Note: Store a single entry in both way meaning for a row with user_id 1 and friend_id 2 also store user_id 2 and friend_id 1 so that indexing can be applied on a single column
+
+    id: The primary key for the user_friend table. This uniquely identifies each friendship.
+    user_id: A foreign key referencing the user_id in the users table, representing one of the users in the friendship.
+    friend_id: A foreign key referencing the user_id in the users table, representing the other user in the friendship.
+    created_date: The date and time when the friendship was established.
+
+
+### Relationships
+
 Users and Roles: A many-to-one relationship between users and roles. Each user has one role, but a role can be associated with many users.
 Friend Requests: Each friend request involves two users (uid1 and uid2), both of which are foreign keys referencing the user_id in the users table.
 Friendships: Similar to friend requests, each friendship involves two users (user_id and friend_id), both of which are foreign keys referencing the user_id in the users table.
-Summary:
+
+### Summary:
 This ER diagram models a basic social system where users can send and accept friend requests, forming friendships. Users have roles that dictate their permissions or abilities within the system.
